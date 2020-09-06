@@ -16,7 +16,9 @@ public class ParameterServiceImpl implements ParameterService {
 	
 	@Override
 	public Parameter getParameterByClient(Long idClient) {
-		return this.parameterRepository.findByIdClient(idClient);
+		Parameter parameter = this.parameterRepository.findByIdClient(idClient);
+		System.out.println(parameter.getBdServer());
+		return parameter;
 	}
 	
 
