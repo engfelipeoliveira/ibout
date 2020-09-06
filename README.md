@@ -1,1 +1,0 @@
-# smkt-batch
