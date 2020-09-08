@@ -2,6 +2,7 @@ package br.com.smktbatch.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -22,10 +23,17 @@ public class Parameter implements Serializable {
 	// generic
 	@Id
 	private Long id;
-	@OneToOne(targetEntity = Client.class)
+	
+	@OneToOne(targetEntity = Client.class, optional = false)
+	@Column(nullable = false)
 	private Client client;
+	
+	@Column(nullable = false)
 	private String dataSource;
+	
+	@Column(nullable = false)
 	private Long hourJob;
+	
 	private boolean importAll;
 	
 	// csv and txt
@@ -45,6 +53,5 @@ public class Parameter implements Serializable {
 	private String bdUser;
 	private String bdPass;
 	private String bdSql;
-	
 
 }
