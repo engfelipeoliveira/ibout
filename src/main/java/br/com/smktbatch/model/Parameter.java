@@ -25,7 +25,6 @@ public class Parameter implements Serializable {
 	private Long id;
 	
 	@OneToOne(targetEntity = Client.class, optional = false)
-	@Column(nullable = false)
 	private Client client;
 	
 	@Column(nullable = false)
