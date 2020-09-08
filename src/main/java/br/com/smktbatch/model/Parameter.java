@@ -4,17 +4,14 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Builder
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@ToString
 public class Parameter implements Serializable {
 
 	/**
@@ -25,9 +22,10 @@ public class Parameter implements Serializable {
 	// generic
 	@Id
 	private Long id;
-	private Long idClient;
+	@OneToOne(targetEntity = Client.class)
+	private Client client;
 	private String dataSource;
-	private String hourJob;
+	private Long hourJob;
 	private boolean importAll;
 	
 	// csv and txt

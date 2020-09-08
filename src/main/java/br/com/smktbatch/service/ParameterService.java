@@ -4,6 +4,6 @@ import br.com.smktbatch.model.Parameter;
 
 public interface ParameterService {
 	
-	Parameter getParameterByClient(Long idClient);
+	Parameter getParameterByClientToken(String token) throws Exception;
 
 }

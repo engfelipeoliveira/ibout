@@ -19,10 +19,9 @@ public class SmktBatchApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		args[0] = "1";
+		args[0] = "abc";
 		
-		Long idClient = Long.parseLong(args[0]);
-		parameterService.getParameterByClient(idClient);
+		parameterService.getParameterByClientToken(args[0]);
 	}
 
 }
