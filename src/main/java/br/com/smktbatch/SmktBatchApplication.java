@@ -5,14 +5,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import br.com.smktbatch.service.ParameterService;
+import br.com.smktbatch.service.MainService;
 
 @SpringBootApplication
-public class SmktBatchApplication implements CommandLineRunner{
+public class SmktBatchApplication implements CommandLineRunner {
 
 	@Autowired
-	private ParameterService parameterService;
-	
+	private MainService mainService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(SmktBatchApplication.class, args);
 	}
@@ -20,8 +20,8 @@ public class SmktBatchApplication implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 		args[0] = "abc";
-		
-		parameterService.getParameterByClientToken(args[0]);
+
+		mainService.execute(args[0]);
 	}
 
 }

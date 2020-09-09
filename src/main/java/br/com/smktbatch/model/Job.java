@@ -4,31 +4,39 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class Job implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private String status;
-	@OneToMany(targetEntity = Error.class)
+	@OneToMany(cascade = CascadeType.ALL,targetEntity = Error.class, mappedBy = "job")
 	private Set<Error> errors;
 
 }
