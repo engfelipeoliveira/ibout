@@ -20,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class Error implements Serializable {
+public class ErrorJob implements Serializable {
 
 	/**
 	 * 

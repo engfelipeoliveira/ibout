@@ -36,7 +36,7 @@ public class Job implements Serializable {
 	private LocalDateTime startTime;
 	private LocalDateTime endTime;
 	private String status;
-	@OneToMany(cascade = CascadeType.ALL,targetEntity = Error.class, mappedBy = "job")
-	private Set<Error> errors;
+	@OneToMany(cascade = CascadeType.ALL,targetEntity = ErrorJob.class, mappedBy = "job")
+	private Set<ErrorJob> errors;
 
 }
