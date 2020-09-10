@@ -27,7 +27,7 @@ public class TxtServiceImpl implements DataSourceService {
 	public void read(Parameter parameter, Mapping mapping) {
 		LOG.info("read()");
 		File dirSource = new File(parameter.getDirSource());
-		String dirTarget = parameter.getDirTarget();
+		String dirTarget = parameter.getDirTarget();x
 		String fileDelimiter = parameter.getFileDelimiter();
 		boolean moveFileAfterRead = parameter.isMoveFileAfterRead();
 
