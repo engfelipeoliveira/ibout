@@ -1,4 +1,4 @@
-package br.com.smktbatch.service;
+package br.com.smktbatch.service.mapping;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

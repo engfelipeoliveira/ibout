@@ -1,4 +1,4 @@
-package br.com.smktbatch.service;
+package br.com.smktbatch.service.mapping;
 
 import br.com.smktbatch.model.Mapping;
 

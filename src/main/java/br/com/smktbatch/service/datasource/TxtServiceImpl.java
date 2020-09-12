@@ -1,4 +1,4 @@
-package br.com.smktbatch.service;
+package br.com.smktbatch.service.datasource;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,7 +27,7 @@ public class TxtServiceImpl implements DataSourceService {
 	public void read(Parameter parameter, Mapping mapping) {
 		LOG.info("read()");
 		File dirSource = new File(parameter.getDirSource());
-		String dirTarget = parameter.getDirTarget();x
+		String dirTarget = parameter.getDirTarget();
 		String fileDelimiter = parameter.getFileDelimiter();
 		boolean moveFileAfterRead = parameter.isMoveFileAfterRead();
 

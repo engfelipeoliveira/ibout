@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Client implements Serializable {
+public class MessageJob implements Serializable {
 
 	/**
 	 * 
@@ -17,8 +17,10 @@ public class Client implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private Long id;
+	private String id;
 	
-	private String token;
+	private String code;
+	
+	private String description;
 
 }

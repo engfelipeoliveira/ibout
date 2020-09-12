@@ -1,4 +1,4 @@
-package br.com.smktbatch.service;
+package br.com.smktbatch.service.datasource;
 
 import br.com.smktbatch.model.Mapping;
 import br.com.smktbatch.model.Parameter;
