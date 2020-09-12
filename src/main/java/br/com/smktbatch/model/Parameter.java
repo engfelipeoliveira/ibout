@@ -9,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import br.com.smktbatch.enums.DataSource;
-import br.com.smktbatch.enums.ParameterStatus;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -33,8 +32,7 @@ public class Parameter implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private DataSource dataSource;
 	
-	@Enumerated(EnumType.STRING)
-	private ParameterStatus parameterStatus;
+	private boolean parameterStatus;
 
 	private Long hourJob;
 

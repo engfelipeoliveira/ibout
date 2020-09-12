@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import br.com.smktbatch.enums.DataSource;
-import br.com.smktbatch.enums.ParameterStatus;
 import br.com.smktbatch.model.Parameter;
 import br.com.smktbatch.repository.ParameterRepository;
 import br.com.smktbatch.service.message.MessageService;
@@ -42,8 +41,7 @@ public class ParameterServiceImpl implements ParameterService {
 
 		if (parameter != null) {
 
-			if (parameter.getParameterStatus() == null
-					|| ParameterStatus.INATIVO.equals(parameter.getParameterStatus())) {
+			if (!parameter.isParameterStatus()) {
 				listErrors.add(this.messageService.getMessageByCode("msg.error.validation.status.job.inactive"));
 			}
 
