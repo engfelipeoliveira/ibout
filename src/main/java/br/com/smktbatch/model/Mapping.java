@@ -25,16 +25,16 @@ public class Mapping implements Serializable {
 	@OneToOne(targetEntity = Client.class, optional = false)
 	private Client client;
 
-	private Long code;
+	private int code;
 
-	private Long name;
+	private int name;
 
-	private Long brand;
+	private int brand;
 
-	private Long description;
+	private int description;
 
-	private Long complement;
+	private int complement;
 
-	private Long price;
+	private int price;
 
 }

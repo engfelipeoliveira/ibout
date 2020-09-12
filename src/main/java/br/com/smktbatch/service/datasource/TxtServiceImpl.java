@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import br.com.smktbatch.dto.ProductDto;
 import br.com.smktbatch.model.Mapping;
 import br.com.smktbatch.model.Parameter;
 
@@ -40,7 +41,7 @@ public class TxtServiceImpl implements DataSourceService {
 		File[] files = dirSource.listFiles(txtFilter);
 		for (File file : files) {
 			try {
-				readProducts(new FileInputStream(file), fileDelimiter);
+				readProducts(new FileInputStream(file), fileDelimiter, mapping);
 				
 				if(moveFileAfterRead && !StringUtils.isBlank(dirTarget)) {
 					//Files.move(file.toPath(), new File(dirTarget).toPath(), StandardCopyOption.ATOMIC_MOVE);
@@ -54,16 +55,31 @@ public class TxtServiceImpl implements DataSourceService {
 		}
 	}
 
-	private void readProducts(InputStream inputStream, String fileDelimiter) throws IOException {
+	private void readProducts(InputStream inputStream, String fileDelimiter, Mapping mapping) throws IOException {
+		LOG.info("readProducts()");
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				String[] columns = StringUtils.split(line, fileDelimiter);
-				System.out.println(columns[1]);
+				ProductDto productDto = map(mapping, line, fileDelimiter);
+				
+				System.out.println(productDto.toString());
 			}
 			br.close();
 			inputStream.close();
 		}
+	}
+	
+	private ProductDto map(Mapping mapping, String line, String fileDelimiter) {
+		String[] columns = StringUtils.split(line, fileDelimiter);
+		return ProductDto.builder()
+				.clientId(mapping.getClient().getId())
+				.code(columns[mapping.getCode()] != null ? StringUtils.trimToNull(columns[mapping.getCode()]) : null)
+				.brand(columns[mapping.getBrand()] != null ? StringUtils.trimToNull(columns[mapping.getBrand()]) : null)
+				.complement(columns[mapping.getCode()] != null ? StringUtils.trimToNull(columns[mapping.getComplement()]) : null)
+				.description(columns[mapping.getDescription()] != null ? StringUtils.trimToNull(columns[mapping.getDescription()]) : null)
+				.name(columns[mapping.getName()] != null ? StringUtils.trimToNull(columns[mapping.getName()]) : null)
+				.price(columns[mapping.getPrice()] != null ? StringUtils.trimToNull(columns[mapping.getPrice()]) : null)
+				.build();
 	}
 
 }

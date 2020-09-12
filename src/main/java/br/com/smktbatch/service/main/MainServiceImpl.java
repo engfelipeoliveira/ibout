@@ -85,10 +85,17 @@ public class MainServiceImpl implements MainService {
 					} else {
 						throw new Exception("tipo de arquivo nao implementado");
 					}
-					dataSourceService.read(parameter, mapping);
-
-					job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.SUCESSO).build();
-					LOG.info("Processo finalizado com sucesso");
+					
+					try {
+						dataSourceService.read(parameter, mapping);	
+						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.SUCESSO).build();
+						LOG.info("Processo finalizado com sucesso");
+					} catch (Exception e) {
+						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getMessageByCode("msg.error.read.file")).build();
+						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error))
+								.build();
+						LOG.info("Processo finalizado com erro");
+					}
 				}
 
 			} else {

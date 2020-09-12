@@ -30,7 +30,7 @@ public class ParameterServiceImpl implements ParameterService {
 
 	@Override
 	public Parameter getParameterByClientToken(String token) throws Exception {
-		LOG.info(String.format("getParameterByClientToken(%s)", token));
+		LOG.info("getParameterByClientToken()");
 		return this.parameterRepository.findByClientToken(token);
 	}
 
