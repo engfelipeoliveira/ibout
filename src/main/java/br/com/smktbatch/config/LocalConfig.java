@@ -1,4 +1,4 @@
-package br.com.smktbatch;
+package br.com.smktbatch.config;
 
 import java.util.HashMap;
 
@@ -35,7 +35,6 @@ public class LocalConfig {
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
 		properties.put("hibernate.hbm2ddl.auto", env.getProperty("local.hibernate.hbm2ddl.auto"));
-		properties.put("spring.datasource.initialize", env.getProperty("local.spring.datasource.initialize"));
 		em.setJpaPropertyMap(properties);
 
 		return em;

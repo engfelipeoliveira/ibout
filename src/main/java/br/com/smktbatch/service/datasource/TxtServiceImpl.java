@@ -10,6 +10,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,8 +27,9 @@ public class TxtServiceImpl implements DataSourceService {
 	private static final Logger LOG = getLogger(TxtServiceImpl.class);
 
 	@Override
-	public void read(Parameter parameter, Mapping mapping) {
+	public List<Product> read(Parameter parameter, Mapping mapping) {
 		LOG.info("read()");
+		List<Product> listProduct = new ArrayList<Product>();
 		File dirSource = new File(parameter.getDirSource());
 		String dirTarget = parameter.getDirTarget();
 		String fileDelimiter = parameter.getFileDelimiter();
@@ -41,7 +44,7 @@ public class TxtServiceImpl implements DataSourceService {
 		File[] files = dirSource.listFiles(txtFilter);
 		for (File file : files) {
 			try {
-				readProducts(new FileInputStream(file), fileDelimiter, mapping);
+				listProduct = readProducts(new FileInputStream(file), fileDelimiter, mapping);
 				
 				if(moveFileAfterRead && !StringUtils.isBlank(dirTarget)) {
 					//Files.move(file.toPath(), new File(dirTarget).toPath(), StandardCopyOption.ATOMIC_MOVE);
@@ -53,20 +56,22 @@ public class TxtServiceImpl implements DataSourceService {
 				e.printStackTrace();
 			}
 		}
+		return listProduct;
 	}
 
-	private void readProducts(InputStream inputStream, String fileDelimiter, Mapping mapping) throws IOException {
+	private List<Product> readProducts(InputStream inputStream, String fileDelimiter, Mapping mapping) throws IOException {
 		LOG.info("readProducts()");
+		List<Product> listProduct = new ArrayList<Product>();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				Product productDto = map(mapping, line, fileDelimiter);
-				
-				System.out.println(productDto.toString());
+				line = line.replace("\n", "").replace("\r", "");
+				listProduct.add(map(mapping, line, fileDelimiter));
 			}
 			br.close();
 			inputStream.close();
 		}
+		return listProduct;
 	}
 	
 	private Product map(Mapping mapping, String line, String fileDelimiter) {

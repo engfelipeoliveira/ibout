@@ -1,4 +1,4 @@
-package br.com.smktbatch;
+package br.com.smktbatch.config;
 
 import java.util.HashMap;
 

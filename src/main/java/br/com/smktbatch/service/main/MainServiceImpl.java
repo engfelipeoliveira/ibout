@@ -41,25 +41,17 @@ public class MainServiceImpl implements MainService {
 
 	private static final Logger LOG = getLogger(MainServiceImpl.class);
 
-	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService, MessageService messageService, ProductService productService) {
+	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService,
+			MessageService messageService, ProductService productService) {
 		this.parameterService = parameterService;
 		this.jobService = jobService;
 		this.mappingService = mappingService;
 		this.messageService = messageService;
-		this.productService= productService;
+		this.productService = productService;
 	}
 
-	
 	@Override
 	public void execute(String tokenClient) throws Exception {
-		Product product = Product.builder().brand("brand").clientId(1L).code("code").complement("complement").description("description").name("name").price("price").build();
-		this.productService.createOrUpdateProduct(product);
-		
-		LOG.info("produtos " + this.productService.findAll().size());
-	}
-	
-//	@Override
-	public void ____execute(String tokenClient) throws Exception {
 		LOG.info(String.format("execute(%s)", tokenClient));
 
 		Job job = Job.builder().startTime(LocalDateTime.now()).status(StatusJob.INICIADO).build();
@@ -68,8 +60,10 @@ public class MainServiceImpl implements MainService {
 		Parameter parameter = this.parameterService.getParameterByClientToken(tokenClient);
 
 		if (parameter == null) {
-			ErrorJob error = ErrorJob.builder().job(job).description(messageService.getMessageByCode("msg.error.validation.parameters.not.found")).build();
-			job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error)).build();
+			ErrorJob error = ErrorJob.builder().job(job)
+					.description(messageService.getMessageByCode("msg.error.validation.parameters.not.found")).build();
+			job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error))
+					.build();
 			LOG.info("Processo finalizado com erro");
 
 		} else {
@@ -78,9 +72,11 @@ public class MainServiceImpl implements MainService {
 
 				Mapping mapping = mappingService.getMappingByClientToken(tokenClient);
 				if (mapping == null) {
-					ErrorJob error = ErrorJob.builder().job(job).description(messageService.getMessageByCode("msg.error.validation.mapping.not.found")).build();
-					job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error))
+					ErrorJob error = ErrorJob.builder().job(job)
+							.description(messageService.getMessageByCode("msg.error.validation.mapping.not.found"))
 							.build();
+					job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO)
+							.errors(Sets.newHashSet(error)).build();
 					LOG.info("Processo finalizado com erro");
 
 				} else {
@@ -98,15 +94,22 @@ public class MainServiceImpl implements MainService {
 					} else {
 						throw new Exception("tipo de arquivo nao implementado");
 					}
-					
+
 					try {
-						dataSourceService.read(parameter, mapping);	
+						List<Product> listProduct = dataSourceService.read(parameter, mapping);
+						listProduct.stream().forEach(product ->{
+							productService.createOrUpdateProduct(product);	
+						});
+						LOG.info(" ---- produtos cadastrados -----" + productService.findAll().size());
+						
+						
 						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.SUCESSO).build();
 						LOG.info("Processo finalizado com sucesso");
 					} catch (Exception e) {
-						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getMessageByCode("msg.error.read.file")).build();
-						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error))
-								.build();
+						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage())
+								.description(messageService.getMessageByCode("msg.error.read.file")).build();
+						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO)
+								.errors(Sets.newHashSet(error)).build();
 						LOG.info("Processo finalizado com erro");
 					}
 				}
