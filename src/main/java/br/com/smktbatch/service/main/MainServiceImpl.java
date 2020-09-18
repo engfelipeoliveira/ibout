@@ -9,11 +9,19 @@ import static br.com.smktbatch.enums.StatusJob.INICIADO;
 import static br.com.smktbatch.enums.StatusJob.SUCESSO;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.String.format;
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.split;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -72,6 +80,11 @@ public class MainServiceImpl implements MainService {
 		} else {
 			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
+				
+				String now = now().format(ofPattern("HH"));
+				
+				boolean isTime = asList(split(parameter.getHourJob(), ",")).contains(now);
+				
 				Mapping mapping = mappingService.getByClientToken(tokenClient);
 				if (mapping == null) {
 					ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.mapping.not.found")).build();

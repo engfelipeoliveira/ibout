@@ -4,12 +4,10 @@ import java.util.HashMap;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -18,12 +16,23 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@PropertySource({ "classpath:persistence-multiple-db.properties" })
 @EnableJpaRepositories(basePackages = "br.com.smktbatch.repository.local", entityManagerFactoryRef = "localEntityManager", transactionManagerRef = "localTransactionManager")
 public class LocalConfig {
 
-	@Autowired
-	private Environment env;
+	@Value("${local.hibernate.hbm2ddl.auto}")
+	private String hibernateHbm2ddlAuto;
+	
+	@Value("${local.jdbc.driverClassName}")
+	private String driverClassName;
+	
+	@Value("${local.jdbc.url}")
+	private String jdbcUrl;
+	
+	@Value("${local.jdbc.user}")
+	private String jdbcUser;
+	
+	@Value("${local.jdbc.pass}")
+	private String jdbcPass;
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean localEntityManager() {
@@ -34,7 +43,7 @@ public class LocalConfig {
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
-		properties.put("hibernate.hbm2ddl.auto", env.getProperty("local.hibernate.hbm2ddl.auto"));
+		properties.put("hibernate.hbm2ddl.auto", hibernateHbm2ddlAuto);
 		em.setJpaPropertyMap(properties);
 
 		return em;
@@ -44,10 +53,10 @@ public class LocalConfig {
 	public DataSource localDataSource() {
 
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(env.getProperty("local.jdbc.driverClassName"));
-		dataSource.setUrl(env.getProperty("local.jdbc.url"));
-		dataSource.setUsername(env.getProperty("local.jdbc.user"));
-		dataSource.setPassword(env.getProperty("local.jdbc.pass"));
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUrl(jdbcUrl);
+		dataSource.setUsername(jdbcUser);
+		dataSource.setPassword(jdbcPass);
 
 		return dataSource;
 	}
