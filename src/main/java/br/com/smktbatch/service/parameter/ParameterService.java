@@ -6,7 +6,7 @@ import br.com.smktbatch.model.remote.Parameter;
 
 public interface ParameterService {
 	
-	Parameter getParameterByClientToken(String token) throws Exception;
-	List<String> validateParameters(Parameter parameter);
+	Parameter getByClientToken(String token) throws Exception;
+	List<String> validate(Parameter parameter);
 
 }

@@ -22,13 +22,14 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Product createOrUpdateProduct(Product product) {
-		LOG.info("createOrUpdateProduct()");
+	public Product createOrUpdate(Product product) {
+		LOG.info("createOrUpdate()");
 		return productRepository.save(product);
 	}
 
 	@Override
-	public List<Product> findAll() {
+	public List<Product> getAll() {
+		LOG.info("getAll()");
 		return this.productRepository.findAll();
 	}
 

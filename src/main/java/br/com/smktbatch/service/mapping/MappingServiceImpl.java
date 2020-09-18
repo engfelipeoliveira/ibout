@@ -20,8 +20,8 @@ public class MappingServiceImpl implements MappingService {
 	}
 
 	@Override
-	public Mapping getMappingByClientToken(String token) {
-		LOG.info("getMappingByClientToken()");
+	public Mapping getByClientToken(String token) {
+		LOG.info("getByClientToken()");
 		return mappingRepository.findByClientToken(token);
 	}
 

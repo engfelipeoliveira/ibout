@@ -6,8 +6,7 @@ import br.com.smktbatch.model.local.Product;
 
 public interface ProductService {
 	
-	Product createOrUpdateProduct(Product product);
-	
-	List<Product> findAll();
+	Product createOrUpdate(Product product);
+	List<Product> getAll();
 
 }

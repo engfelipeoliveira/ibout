@@ -1,5 +1,14 @@
 package br.com.smktbatch.service.main;
 
+import static br.com.smktbatch.enums.DataSource.CSV;
+import static br.com.smktbatch.enums.DataSource.DB;
+import static br.com.smktbatch.enums.DataSource.TXT;
+import static br.com.smktbatch.enums.DataSource.XLS;
+import static br.com.smktbatch.enums.StatusJob.ERRO;
+import static br.com.smktbatch.enums.StatusJob.INICIADO;
+import static br.com.smktbatch.enums.StatusJob.SUCESSO;
+import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.time.LocalDateTime;
@@ -10,10 +19,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Sets;
-
 import br.com.smktbatch.enums.DataSource;
-import br.com.smktbatch.enums.StatusJob;
 import br.com.smktbatch.model.local.Product;
 import br.com.smktbatch.model.remote.ErrorJob;
 import br.com.smktbatch.model.remote.Job;
@@ -52,36 +58,25 @@ public class MainServiceImpl implements MainService {
 
 	@Override
 	public void execute(String tokenClient) throws Exception {
-		LOG.info(String.format("execute(%s)", tokenClient));
+		LOG.info(format("execute(%s)", tokenClient));
 		
-		LOG.info(" ---- produtos cadastrados -----" + productService.findAll().size());
-		
+		Job job = Job.builder().startTime(LocalDateTime.now()).status(INICIADO).build();
+		job = this.jobService.createOrUpdate(job);
 
-		Job job = Job.builder().startTime(LocalDateTime.now()).status(StatusJob.INICIADO).build();
-		job = this.jobService.createOrUpdateJob(job);
-
-		Parameter parameter = this.parameterService.getParameterByClientToken(tokenClient);
+		Parameter parameter = this.parameterService.getByClientToken(tokenClient);
 
 		if (parameter == null) {
-			ErrorJob error = ErrorJob.builder().job(job)
-					.description(messageService.getMessageByCode("msg.error.validation.parameters.not.found")).build();
-			job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(Sets.newHashSet(error))
-					.build();
+			ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.parameters.not.found")).build();
+			job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
 			LOG.info("Processo finalizado com erro");
-
 		} else {
-			List<String> listError = this.parameterService.validateParameters(parameter);
+			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
-
-				Mapping mapping = mappingService.getMappingByClientToken(tokenClient);
+				Mapping mapping = mappingService.getByClientToken(tokenClient);
 				if (mapping == null) {
-					ErrorJob error = ErrorJob.builder().job(job)
-							.description(messageService.getMessageByCode("msg.error.validation.mapping.not.found"))
-							.build();
-					job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO)
-							.errors(Sets.newHashSet(error)).build();
+					ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.mapping.not.found")).build();
+					job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
 					LOG.info("Processo finalizado com erro");
-
 				} else {
 					DataSource dataSource = parameter.getDataSource();
 					DataSourceService dataSourceService = dataSourceFactory(dataSource);
@@ -89,16 +84,14 @@ public class MainServiceImpl implements MainService {
 					try {
 						List<Product> listProduct = dataSourceService.read(parameter, mapping);
 						listProduct.stream().forEach(product ->{
-							productService.createOrUpdateProduct(product);	
+							productService.createOrUpdate(product);	
 						});
 						
-						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.SUCESSO).build();
+						job = job.toBuilder().endTime(LocalDateTime.now()).status(SUCESSO).build();
 						LOG.info("Processo finalizado com sucesso");
 					} catch (Exception e) {
-						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage())
-								.description(messageService.getMessageByCode("msg.error.read.file")).build();
-						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO)
-								.errors(Sets.newHashSet(error)).build();
+						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.read.file")).build();
+						job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
 						LOG.info("Processo finalizado com erro");
 					}
 				}
@@ -109,25 +102,25 @@ public class MainServiceImpl implements MainService {
 					errors.add(ErrorJob.builder().job(job).description(e).build());
 				}
 
-				job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.ERRO).errors(errors).build();
+				job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(errors).build();
 				LOG.info("Processo finalizado com erro");
 			}
 		}
 
-		this.jobService.createOrUpdateJob(job);
+		this.jobService.createOrUpdate(job);
 
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {
 		DataSourceService dataSourceService = null;
 
-		if (DataSource.TXT.equals(dataSource)) {
+		if (TXT.equals(dataSource)) {
 			dataSourceService = new TxtServiceImpl();
-		} else if (DataSource.CSV.equals(dataSource)) {
+		} else if (CSV.equals(dataSource)) {
 			dataSourceService = new CsvServiceImpl();
-		} else if (DataSource.XLS.equals(dataSource)) {
+		} else if (XLS.equals(dataSource)) {
 			dataSourceService = new XlsServiceImpl();
-		} else if (DataSource.DB.equals(dataSource)) {
+		} else if (DB.equals(dataSource)) {
 			dataSourceService = new DbServiceImpl();
 		}else {
 			throw new Exception("tipo de arquivo nao implementado");

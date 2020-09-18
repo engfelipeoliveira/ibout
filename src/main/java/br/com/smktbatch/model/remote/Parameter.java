@@ -34,7 +34,7 @@ public class Parameter implements Serializable {
 	
 	private boolean parameterStatus;
 
-	private Long hourJob;
+	private String hourJob;
 
 	private boolean importAll;
 

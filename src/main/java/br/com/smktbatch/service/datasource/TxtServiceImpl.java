@@ -1,5 +1,9 @@
 package br.com.smktbatch.service.datasource;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.BufferedReader;
@@ -13,7 +17,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +31,7 @@ public class TxtServiceImpl implements DataSourceService {
 
 	@Override
 	public List<Product> read(Parameter parameter, Mapping mapping) {
-		LOG.info("read()");
+		LOG.info(format("read()"));
 		List<Product> listProduct = new ArrayList<Product>();
 		File dirSource = new File(parameter.getDirSource());
 		String dirTarget = parameter.getDirTarget();
@@ -46,7 +49,7 @@ public class TxtServiceImpl implements DataSourceService {
 			try {
 				listProduct = readProducts(new FileInputStream(file), fileDelimiter, mapping);
 				
-				if(moveFileAfterRead && !StringUtils.isBlank(dirTarget)) {
+				if(moveFileAfterRead && !isBlank(dirTarget)) {
 					//Files.move(file.toPath(), new File(dirTarget).toPath(), StandardCopyOption.ATOMIC_MOVE);
 				}
 				
@@ -65,7 +68,6 @@ public class TxtServiceImpl implements DataSourceService {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				line = line.replace("\n", "").replace("\r", "");
 				listProduct.add(map(mapping, line, fileDelimiter));
 			}
 			br.close();
@@ -75,15 +77,15 @@ public class TxtServiceImpl implements DataSourceService {
 	}
 	
 	private Product map(Mapping mapping, String line, String fileDelimiter) {
-		String[] columns = StringUtils.split(line, fileDelimiter);
+		String[] columns = split(line, fileDelimiter);
 		return Product.builder()
 				.clientId(mapping.getClient().getId())
-				.code(columns[mapping.getCode()] != null ? StringUtils.trimToNull(columns[mapping.getCode()]) : null)
-				.brand(columns[mapping.getBrand()] != null ? StringUtils.trimToNull(columns[mapping.getBrand()]) : null)
-				.complement(columns[mapping.getCode()] != null ? StringUtils.trimToNull(columns[mapping.getComplement()]) : null)
-				.description(columns[mapping.getDescription()] != null ? StringUtils.trimToNull(columns[mapping.getDescription()]) : null)
-				.name(columns[mapping.getName()] != null ? StringUtils.trimToNull(columns[mapping.getName()]) : null)
-				.price(columns[mapping.getPrice()] != null ? StringUtils.trimToNull(columns[mapping.getPrice()]) : null)
+				.code(columns[mapping.getCode()] != null ? trimToNull(columns[mapping.getCode()]) : null)
+				.brand(columns[mapping.getBrand()] != null ? trimToNull(columns[mapping.getBrand()]) : null)
+				.complement(columns[mapping.getCode()] != null ? trimToNull(columns[mapping.getComplement()]) : null)
+				.description(columns[mapping.getDescription()] != null ? trimToNull(columns[mapping.getDescription()]) : null)
+				.name(columns[mapping.getName()] != null ? trimToNull(columns[mapping.getName()]) : null)
+				.price(columns[mapping.getPrice()] != null ? trimToNull(columns[mapping.getPrice()]) : null)
 				.build();
 	}
 

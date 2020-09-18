@@ -19,8 +19,8 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public String getMessageByCode(String code) {
-		LOG.info("getMessageByCode()");
+	public String getByCode(String code) {
+		LOG.info("getByCode()");
 		return this.messageRepository.findByCode(code).getDescription();
 	}
 

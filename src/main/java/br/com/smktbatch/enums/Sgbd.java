@@ -1,6 +1,5 @@
 package br.com.smktbatch.enums;
 
-public enum SGBD {
+public enum Sgbd {
 	MYSQL, ORACLE, POSTGRE
-
 }

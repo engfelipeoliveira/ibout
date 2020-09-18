@@ -20,8 +20,8 @@ public class JobServiceImpl implements JobService {
 	}
 
 	@Override
-	public Job createOrUpdateJob(Job job) {
-		LOG.info("createOrUpdateJob()");
+	public Job createOrUpdate(Job job) {
+		LOG.info("createOrUpdate()");
 		return jobRepository.save(job);
 	}
 
