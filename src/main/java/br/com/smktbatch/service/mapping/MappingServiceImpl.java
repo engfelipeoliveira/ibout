@@ -5,8 +5,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import br.com.smktbatch.model.Mapping;
-import br.com.smktbatch.repository.MappingRepository;
+import br.com.smktbatch.model.remote.Mapping;
+import br.com.smktbatch.repository.remote.MappingRepository;
 
 @Service
 public class MappingServiceImpl implements MappingService {

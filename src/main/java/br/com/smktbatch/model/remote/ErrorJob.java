@@ -1,4 +1,4 @@
-package br.com.smktbatch.model;
+package br.com.smktbatch.model.remote;
 
 import java.io.Serializable;
 

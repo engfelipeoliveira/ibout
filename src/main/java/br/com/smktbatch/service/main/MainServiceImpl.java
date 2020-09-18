@@ -14,10 +14,11 @@ import com.google.common.collect.Sets;
 
 import br.com.smktbatch.enums.DataSource;
 import br.com.smktbatch.enums.StatusJob;
-import br.com.smktbatch.model.ErrorJob;
-import br.com.smktbatch.model.Job;
-import br.com.smktbatch.model.Mapping;
-import br.com.smktbatch.model.Parameter;
+import br.com.smktbatch.model.local.Product;
+import br.com.smktbatch.model.remote.ErrorJob;
+import br.com.smktbatch.model.remote.Job;
+import br.com.smktbatch.model.remote.Mapping;
+import br.com.smktbatch.model.remote.Parameter;
 import br.com.smktbatch.service.datasource.CsvServiceImpl;
 import br.com.smktbatch.service.datasource.DataSourceService;
 import br.com.smktbatch.service.datasource.DbServiceImpl;
@@ -27,6 +28,7 @@ import br.com.smktbatch.service.job.JobService;
 import br.com.smktbatch.service.mapping.MappingService;
 import br.com.smktbatch.service.message.MessageService;
 import br.com.smktbatch.service.parameter.ParameterService;
+import br.com.smktbatch.service.product.ProductService;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -35,18 +37,29 @@ public class MainServiceImpl implements MainService {
 	private final JobService jobService;
 	private final MappingService mappingService;
 	private final MessageService messageService;
+	private final ProductService productService;
 
 	private static final Logger LOG = getLogger(MainServiceImpl.class);
 
-	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService, MessageService messageService) {
+	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService, MessageService messageService, ProductService productService) {
 		this.parameterService = parameterService;
 		this.jobService = jobService;
 		this.mappingService = mappingService;
 		this.messageService = messageService;
+		this.productService= productService;
 	}
 
+	
 	@Override
 	public void execute(String tokenClient) throws Exception {
+		Product product = Product.builder().brand("brand").clientId(1L).code("code").complement("complement").description("description").name("name").price("price").build();
+		this.productService.createOrUpdateProduct(product);
+		
+		LOG.info("produtos " + this.productService.findAll().size());
+	}
+	
+//	@Override
+	public void ____execute(String tokenClient) throws Exception {
 		LOG.info(String.format("execute(%s)", tokenClient));
 
 		Job job = Job.builder().startTime(LocalDateTime.now()).status(StatusJob.INICIADO).build();

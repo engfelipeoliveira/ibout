@@ -1,7 +1,7 @@
 package br.com.smktbatch.service.datasource;
 
-import br.com.smktbatch.model.Mapping;
-import br.com.smktbatch.model.Parameter;
+import br.com.smktbatch.model.remote.Mapping;
+import br.com.smktbatch.model.remote.Parameter;
 
 public interface DataSourceService {
 

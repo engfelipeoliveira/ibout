@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import br.com.smktbatch.enums.DataSource;
-import br.com.smktbatch.model.Parameter;
-import br.com.smktbatch.repository.ParameterRepository;
+import br.com.smktbatch.model.remote.Parameter;
+import br.com.smktbatch.repository.remote.ParameterRepository;
 import br.com.smktbatch.service.message.MessageService;
 
 @Service

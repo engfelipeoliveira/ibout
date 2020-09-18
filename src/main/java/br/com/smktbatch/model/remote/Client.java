@@ -1,4 +1,4 @@
-package br.com.smktbatch.model;
+package br.com.smktbatch.model.remote;
 
 import java.io.Serializable;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class MessageJob implements Serializable {
+public class Client implements Serializable {
 
 	/**
 	 * 
@@ -17,10 +17,8 @@ public class MessageJob implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private String id;
+	private Long id;
 	
-	private String code;
-	
-	private String description;
+	private String token;
 
 }

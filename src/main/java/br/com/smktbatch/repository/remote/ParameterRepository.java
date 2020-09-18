@@ -1,8 +1,11 @@
-package br.com.smktbatch.repository;
+package br.com.smktbatch.repository.remote;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.smktbatch.model.Parameter;
+import org.springframework.stereotype.Repository;
 
+import br.com.smktbatch.model.remote.Parameter;
+
+@Repository
 public interface ParameterRepository extends JpaRepository<Parameter , Long> {
 	
 	Parameter findByClientToken(String token);

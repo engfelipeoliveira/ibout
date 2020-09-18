@@ -15,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import br.com.smktbatch.dto.ProductDto;
-import br.com.smktbatch.model.Mapping;
-import br.com.smktbatch.model.Parameter;
+import br.com.smktbatch.model.local.Product;
+import br.com.smktbatch.model.remote.Mapping;
+import br.com.smktbatch.model.remote.Parameter;
 
 @Service
 public class TxtServiceImpl implements DataSourceService {
@@ -60,7 +60,7 @@ public class TxtServiceImpl implements DataSourceService {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				ProductDto productDto = map(mapping, line, fileDelimiter);
+				Product productDto = map(mapping, line, fileDelimiter);
 				
 				System.out.println(productDto.toString());
 			}
@@ -69,9 +69,9 @@ public class TxtServiceImpl implements DataSourceService {
 		}
 	}
 	
-	private ProductDto map(Mapping mapping, String line, String fileDelimiter) {
+	private Product map(Mapping mapping, String line, String fileDelimiter) {
 		String[] columns = StringUtils.split(line, fileDelimiter);
-		return ProductDto.builder()
+		return Product.builder()
 				.clientId(mapping.getClient().getId())
 				.code(columns[mapping.getCode()] != null ? StringUtils.trimToNull(columns[mapping.getCode()]) : null)
 				.brand(columns[mapping.getBrand()] != null ? StringUtils.trimToNull(columns[mapping.getBrand()]) : null)

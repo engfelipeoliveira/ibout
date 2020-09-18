@@ -5,7 +5,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import br.com.smktbatch.repository.MessageRepository;
+import br.com.smktbatch.repository.remote.MessageRepository;
 
 @Service
 public class MessageServiceImpl implements MessageService {

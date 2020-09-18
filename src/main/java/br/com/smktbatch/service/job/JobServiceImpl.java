@@ -5,8 +5,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import br.com.smktbatch.model.Job;
-import br.com.smktbatch.repository.JobRepository;
+import br.com.smktbatch.model.remote.Job;
+import br.com.smktbatch.repository.remote.JobRepository;
 
 @Service
 public class JobServiceImpl implements JobService {
