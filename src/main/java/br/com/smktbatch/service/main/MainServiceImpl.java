@@ -53,6 +53,9 @@ public class MainServiceImpl implements MainService {
 	@Override
 	public void execute(String tokenClient) throws Exception {
 		LOG.info(String.format("execute(%s)", tokenClient));
+		
+		LOG.info(" ---- produtos cadastrados -----" + productService.findAll().size());
+		
 
 		Job job = Job.builder().startTime(LocalDateTime.now()).status(StatusJob.INICIADO).build();
 		job = this.jobService.createOrUpdateJob(job);
@@ -81,27 +84,13 @@ public class MainServiceImpl implements MainService {
 
 				} else {
 					DataSource dataSource = parameter.getDataSource();
-					DataSourceService dataSourceService = null;
-
-					if (DataSource.TXT.equals(dataSource)) {
-						dataSourceService = new TxtServiceImpl();
-					} else if (DataSource.CSV.equals(dataSource)) {
-						dataSourceService = new CsvServiceImpl();
-					} else if (DataSource.XLS.equals(dataSource)) {
-						dataSourceService = new XlsServiceImpl();
-					} else if (DataSource.DB.equals(dataSource)) {
-						dataSourceService = new DbServiceImpl();
-					} else {
-						throw new Exception("tipo de arquivo nao implementado");
-					}
+					DataSourceService dataSourceService = dataSourceFactory(dataSource);
 
 					try {
 						List<Product> listProduct = dataSourceService.read(parameter, mapping);
 						listProduct.stream().forEach(product ->{
 							productService.createOrUpdateProduct(product);	
 						});
-						LOG.info(" ---- produtos cadastrados -----" + productService.findAll().size());
-						
 						
 						job = job.toBuilder().endTime(LocalDateTime.now()).status(StatusJob.SUCESSO).build();
 						LOG.info("Processo finalizado com sucesso");
@@ -127,6 +116,23 @@ public class MainServiceImpl implements MainService {
 
 		this.jobService.createOrUpdateJob(job);
 
+	}
+	
+	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {
+		DataSourceService dataSourceService = null;
+
+		if (DataSource.TXT.equals(dataSource)) {
+			dataSourceService = new TxtServiceImpl();
+		} else if (DataSource.CSV.equals(dataSource)) {
+			dataSourceService = new CsvServiceImpl();
+		} else if (DataSource.XLS.equals(dataSource)) {
+			dataSourceService = new XlsServiceImpl();
+		} else if (DataSource.DB.equals(dataSource)) {
+			dataSourceService = new DbServiceImpl();
+		}else {
+			throw new Exception("tipo de arquivo nao implementado");
+		}
+		return dataSourceService; 
 	}
 
 }
