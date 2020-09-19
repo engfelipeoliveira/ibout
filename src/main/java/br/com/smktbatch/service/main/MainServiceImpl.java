@@ -71,6 +71,7 @@ public class MainServiceImpl implements MainService {
 			LOG.error("Processo finalizado com erro");
 			this.jobService.createOrUpdate(job);
 		} else {
+			LOG.info(parameter.toString());
 			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
 				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH")))){
@@ -81,6 +82,7 @@ public class MainServiceImpl implements MainService {
 						job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
 						LOG.error("Processo finalizado com erro");
 					} else {
+						LOG.info(mapping.toString());
 						try {
 							List<Product> listProduct = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
 							listProduct.stream().forEach(product ->{
