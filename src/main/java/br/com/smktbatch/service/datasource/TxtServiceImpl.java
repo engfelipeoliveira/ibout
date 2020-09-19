@@ -43,7 +43,7 @@ public class TxtServiceImpl implements DataSourceService {
 		File[] files = new File(parameter.getDirSource()).listFiles(txtFilter);
 		for (File file : files) {
 			try {
-				listProduct = readProducts(new FileInputStream(file), parameter.getFileDelimiter(), mapping);				
+				listProduct = readProducts(new FileInputStream(file), parameter, mapping);				
 				if(parameter.isMoveFileAfterRead() && !isBlank(dirTarget)) {					
 					move(get(file.getAbsolutePath()), get(new File(dirTarget + md5Hex(now().toString()).toUpperCase() + "_" + file.getName()).getAbsolutePath())); 					
 				}				
@@ -56,12 +56,16 @@ public class TxtServiceImpl implements DataSourceService {
 		return listProduct;
 	}
 
-	private List<Product> readProducts(InputStream inputStream, String fileDelimiter, Mapping mapping) throws IOException {
+	private List<Product> readProducts(InputStream inputStream, Parameter parameter, Mapping mapping) throws IOException {
 		List<Product> listProduct = new ArrayList<Product>();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;
+			if(parameter.isHeader()) {
+				br.readLine();
+			}
+			
 			while ((line = br.readLine()) != null) {
-				listProduct.add(map(mapping, line, fileDelimiter));
+				listProduct.add(map(mapping, line, parameter.getFileDelimiter()));
 			}
 			br.close();
 			inputStream.close();
