@@ -26,4 +26,9 @@ public class ProductServiceImpl implements ProductService {
 		return this.productRepository.findAll();
 	}
 
+	@Override
+	public void deleteAll() {
+		this.productRepository.deleteAll();
+	}
+
 }

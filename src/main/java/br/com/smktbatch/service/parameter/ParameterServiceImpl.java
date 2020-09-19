@@ -38,13 +38,11 @@ public class ParameterServiceImpl implements ParameterService {
 
 	@Override
 	public Parameter getByClientToken(String token) throws Exception {
-		LOG.info("getByClientToken()");
 		return this.parameterRepository.findByClientToken(token);
 	}
 
 	@Override
 	public List<String> validate(Parameter parameter) {
-		LOG.info("validate()");
 		List<String> listErrors = new ArrayList<String>();
 
 		if (parameter != null) {

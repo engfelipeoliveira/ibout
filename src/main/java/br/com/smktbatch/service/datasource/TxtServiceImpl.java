@@ -1,11 +1,13 @@
 package br.com.smktbatch.service.datasource;
 
 import static br.com.smktbatch.enums.DataSource.TXT;
-import static java.lang.String.format;
+import static java.nio.file.Files.move;
+import static java.nio.file.Paths.get;
+import static java.time.LocalDateTime.now;
+import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +20,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import br.com.smktbatch.model.local.Product;
@@ -28,16 +29,10 @@ import br.com.smktbatch.model.remote.Parameter;
 @Service
 public class TxtServiceImpl implements DataSourceService {
 
-	private static final Logger LOG = getLogger(TxtServiceImpl.class);
-
 	@Override
 	public List<Product> read(Parameter parameter, Mapping mapping) {
-		LOG.info(format("read()"));
 		List<Product> listProduct = new ArrayList<Product>();
-		File dirSource = new File(parameter.getDirSource());
 		String dirTarget = parameter.getDirTarget();
-		String fileDelimiter = parameter.getFileDelimiter();
-		boolean moveFileAfterRead = parameter.isMoveFileAfterRead();
 
 		FilenameFilter txtFilter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -45,15 +40,13 @@ public class TxtServiceImpl implements DataSourceService {
 			}
 		};
 
-		File[] files = dirSource.listFiles(txtFilter);
+		File[] files = new File(parameter.getDirSource()).listFiles(txtFilter);
 		for (File file : files) {
 			try {
-				listProduct = readProducts(new FileInputStream(file), fileDelimiter, mapping);
-				
-				if(moveFileAfterRead && !isBlank(dirTarget)) {
-					//Files.move(file.toPath(), new File(dirTarget).toPath(), StandardCopyOption.ATOMIC_MOVE);
-				}
-				
+				listProduct = readProducts(new FileInputStream(file), parameter.getFileDelimiter(), mapping);				
+				if(parameter.isMoveFileAfterRead() && !isBlank(dirTarget)) {					
+					move(get(file.getAbsolutePath()), get(new File(dirTarget + md5Hex(now().toString()).toUpperCase() + "_" + file.getName()).getAbsolutePath())); 					
+				}				
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -64,7 +57,6 @@ public class TxtServiceImpl implements DataSourceService {
 	}
 
 	private List<Product> readProducts(InputStream inputStream, String fileDelimiter, Mapping mapping) throws IOException {
-		LOG.info("readProducts()");
 		List<Product> listProduct = new ArrayList<Product>();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
 			String line;

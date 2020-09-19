@@ -84,10 +84,12 @@ public class MainServiceImpl implements MainService {
 					} else {
 						LOG.info(mapping.toString());
 						try {
-							List<Product> listProduct = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
-							listProduct.stream().forEach(product ->{
-								productService.createOrUpdate(product);	
-							});
+							if(parameter.isImportAll()) {
+								LOG.info("Deletando produtos do banco de dados local");
+								productService.deleteAll();
+							}
+							
+							createProduct(parameter, mapping);							
 							
 							job = job.toBuilder().endTime(now()).status(SUCESSO).build();
 							LOG.info("Processo finalizado com sucesso");
@@ -114,6 +116,20 @@ public class MainServiceImpl implements MainService {
 				this.jobService.createOrUpdate(job);
 			}
 		}
+	}
+	
+	private void createProduct(Parameter parameter, Mapping mapping) throws Exception {
+		LOG.info("Comparando e criando produtos");
+		dataSourceFactory(parameter.getDataSource()).read(parameter, mapping).stream().forEach(product ->{
+			Product productSaved = this.productService.getAll().stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
+			if(productSaved == null) {
+				productService.createOrUpdate(product);
+			}else if(!productSaved.equals(product)){
+				LOG.info(product.toString());
+				product.setId(productSaved.getId());
+				productService.createOrUpdate(product);
+			}
+		});
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {
