@@ -1,5 +1,6 @@
 package br.com.smktbatch.service.datasource;
 
+import static br.com.smktbatch.enums.DataSource.TXT;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -40,7 +41,7 @@ public class TxtServiceImpl implements DataSourceService {
 
 		FilenameFilter txtFilter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".txt");
+				return name.toUpperCase().endsWith(TXT.toString());
 			}
 		};
 

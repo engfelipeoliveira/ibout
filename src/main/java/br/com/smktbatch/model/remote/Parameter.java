@@ -32,7 +32,7 @@ public class Parameter implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private DataSource dataSource;
 	
-	private boolean parameterStatus;
+	private boolean active;
 
 	private String hourJob;
 

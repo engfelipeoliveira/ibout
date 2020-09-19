@@ -15,13 +15,8 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -68,77 +63,70 @@ public class MainServiceImpl implements MainService {
 	public void execute(String tokenClient) throws Exception {
 		LOG.info(format("execute(%s)", tokenClient));
 		
-		Job job = Job.builder().startTime(LocalDateTime.now()).status(INICIADO).build();
-		job = this.jobService.createOrUpdate(job);
-
+		Job job = Job.builder().startTime(now()).status(INICIADO).build();
 		Parameter parameter = this.parameterService.getByClientToken(tokenClient);
-
 		if (parameter == null) {
 			ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.parameters.not.found")).build();
-			job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
-			LOG.info("Processo finalizado com erro");
+			job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
+			LOG.error("Processo finalizado com erro");
+			this.jobService.createOrUpdate(job);
 		} else {
 			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
-				
-				String now = now().format(ofPattern("HH"));
-				
-				boolean isTime = asList(split(parameter.getHourJob(), ",")).contains(now);
-				
-				Mapping mapping = mappingService.getByClientToken(tokenClient);
-				if (mapping == null) {
-					ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.mapping.not.found")).build();
-					job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
-					LOG.info("Processo finalizado com erro");
-				} else {
-					DataSource dataSource = parameter.getDataSource();
-					DataSourceService dataSourceService = dataSourceFactory(dataSource);
-
-					try {
-						List<Product> listProduct = dataSourceService.read(parameter, mapping);
-						listProduct.stream().forEach(product ->{
-							productService.createOrUpdate(product);	
-						});
-						
-						job = job.toBuilder().endTime(LocalDateTime.now()).status(SUCESSO).build();
-						LOG.info("Processo finalizado com sucesso");
-					} catch (Exception e) {
-						ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.read.file")).build();
-						job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(newHashSet(error)).build();
-						LOG.info("Processo finalizado com erro");
+				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH")))){
+					job = this.jobService.createOrUpdate(job);
+					Mapping mapping = mappingService.getByClientToken(tokenClient);
+					if (mapping == null) {
+						ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.validation.mapping.not.found")).build();
+						job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
+						LOG.error("Processo finalizado com erro");
+					} else {
+						try {
+							List<Product> listProduct = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
+							listProduct.stream().forEach(product ->{
+								productService.createOrUpdate(product);	
+							});
+							
+							job = job.toBuilder().endTime(now()).status(SUCESSO).build();
+							LOG.info("Processo finalizado com sucesso");
+						} catch (Exception e) {
+							ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.read.file")).build();
+							job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
+							LOG.error("Processo finalizado com erro");
+						}
 					}
+					this.jobService.createOrUpdate(job);
+				}else {
+					LOG.info("Status inativo ou nao e a hora de executar");
+					LOG.info("Processo finalizado sem execucao");
 				}
-
 			} else {
+				this.jobService.createOrUpdate(job);
 				Set<ErrorJob> errors = new HashSet<ErrorJob>();
 				for (String e : listError) {
 					errors.add(ErrorJob.builder().job(job).description(e).build());
 				}
 
-				job = job.toBuilder().endTime(LocalDateTime.now()).status(ERRO).errors(errors).build();
-				LOG.info("Processo finalizado com erro");
+				job = job.toBuilder().endTime(now()).status(ERRO).errors(errors).build();
+				LOG.error("Processo finalizado com erro");
+				this.jobService.createOrUpdate(job);
 			}
 		}
-
-		this.jobService.createOrUpdate(job);
-
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {
-		DataSourceService dataSourceService = null;
-
 		if (TXT.equals(dataSource)) {
-			dataSourceService = new TxtServiceImpl();
+			return new TxtServiceImpl();
 		} else if (CSV.equals(dataSource)) {
-			dataSourceService = new CsvServiceImpl();
+			return new CsvServiceImpl();
 		} else if (XLS.equals(dataSource)) {
-			dataSourceService = new XlsServiceImpl();
+			return new XlsServiceImpl();
 		} else if (DB.equals(dataSource)) {
-			dataSourceService = new DbServiceImpl();
+			return new DbServiceImpl();
 		}else {
-			throw new Exception("tipo de arquivo nao implementado");
+			LOG.error("Tipo de arquivo nao implementado");
+			throw new Exception("Tipo de arquivo nao implementado");
 		}
-		return dataSourceService; 
 	}
 
 }
