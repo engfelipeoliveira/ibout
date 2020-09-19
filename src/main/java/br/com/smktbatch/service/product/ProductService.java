@@ -9,5 +9,4 @@ public interface ProductService {
 	Product createOrUpdate(Product product);
 	List<Product> getAll();
 	void deleteAll();
-
 }

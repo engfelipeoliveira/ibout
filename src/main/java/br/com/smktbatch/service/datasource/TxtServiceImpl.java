@@ -28,7 +28,7 @@ import br.com.smktbatch.model.remote.Parameter;
 
 @Service
 public class TxtServiceImpl implements DataSourceService {
-
+	
 	@Override
 	public List<Product> read(Parameter parameter, Mapping mapping) {
 		List<Product> listProduct = new ArrayList<Product>();
@@ -65,7 +65,7 @@ public class TxtServiceImpl implements DataSourceService {
 			}
 			
 			while ((line = br.readLine()) != null) {
-				listProduct.add(map(mapping, line, parameter.getFileDelimiter()));
+				listProduct.add(this.map(mapping, line, parameter.getFileDelimiter()));
 			}
 			br.close();
 			inputStream.close();
