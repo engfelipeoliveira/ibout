@@ -55,9 +55,9 @@ public class Parameter implements Serializable {
 	// database
 	private String sgbd;
 	
-	private String bdServer;
+	private String bdUrl;
 	
-	private String bdPort;
+	private String bdDriver;
 	
 	private String bdUser;
 	

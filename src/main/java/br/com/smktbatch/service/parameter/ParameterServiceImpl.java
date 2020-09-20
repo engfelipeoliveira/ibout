@@ -135,7 +135,7 @@ public class ParameterServiceImpl implements ParameterService {
 			}
 			
 			if (parameter.getDataSource() != null && DB.equals(parameter.getDataSource())
-					&& isAnyBlank(new String[] { parameter.getSgbd(), parameter.getBdServer(), parameter.getBdPort(), parameter.getBdUser(), parameter.getBdPass(), parameter.getBdSql() })) {
+					&& isAnyBlank(new String[] { parameter.getSgbd(), parameter.getBdUrl(), parameter.getBdDriver(), parameter.getBdUser(), parameter.getBdPass(), parameter.getBdSql() })) {
 				LOG.error(this.messageService.getByCode("msg.error.validation.database.invalid"));
 				listErrors.add(this.messageService.getByCode("msg.error.validation.database.invalid"));
 			}
