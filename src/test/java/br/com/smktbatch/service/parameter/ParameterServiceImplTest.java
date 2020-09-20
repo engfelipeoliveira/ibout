@@ -1,6 +1,7 @@
 package br.com.smktbatch.service.parameter;
 
 import static br.com.smktbatch.enums.DataSource.CSV;
+import static br.com.smktbatch.enums.DataSource.DB;
 import static br.com.smktbatch.enums.DataSource.INVALIDO;
 import static br.com.smktbatch.enums.DataSource.TXT;
 import static br.com.smktbatch.enums.DataSource.XLS;
@@ -148,7 +149,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceTxtAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("c:\\invalid_dir_not_exists").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -158,7 +159,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceCsvAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("c:\\invalid_dir_not_exists").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -168,7 +169,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceXlsAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("invalid_dir_not_exists").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -180,7 +181,7 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("temp_junit_dir_source").build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		
@@ -193,7 +194,7 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("temp_junit_dir_source").build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		
@@ -206,11 +207,173 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("temp_junit_dir_source").build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceTxtAndDirTargetNotExistsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		Parameter parameter = Parameter.builder().dataSource(TXT).moveFileAfterRead(true).dirTarget("invalid_dir_not_exists").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceCsvAndDirTargetNotExistsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		Parameter parameter = Parameter.builder().dataSource(CSV).moveFileAfterRead(true).dirTarget("invalid_dir_not_exists").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceXlsAndDirTargetNotExistsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		Parameter parameter = Parameter.builder().dataSource(XLS).moveFileAfterRead(true).dirTarget("invalid_dir_not_exists").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.target.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceTxtAndDirTargetEqualsDirSource_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		Parameter parameter = Parameter.builder().dataSource(TXT).moveFileAfterRead(true).dirTarget("dir_source_equals_target").dirSource("dir_source_equals_target").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceCsvAndDirTargetEqualsDirSource_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		Parameter parameter = Parameter.builder().dataSource(CSV).moveFileAfterRead(true).dirTarget("dir_source_equals_target").dirSource("dir_source_equals_target").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceXlsAndDirTargetEqualsDirSource_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		Parameter parameter = Parameter.builder().dataSource(XLS).moveFileAfterRead(true).dirTarget("dir_source_equals_target").dirSource("dir_source_equals_target").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.target.equals");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndSgbdIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).sgbd(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndDbUrlIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).bdUrl(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndDbDriverIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).bdDriver(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndDbUserIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).bdUser(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndDbPassIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).bdPass(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceDbAndDbSqlIsNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		Parameter parameter = Parameter.builder().dataSource(DB).bdSql(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.database.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterFileValid_thenReturnListEmpty() throws Exception {
+		Path source = get("dir_source_test_unit");
+		Path subDir = get("dir_source_test_unit/1");
+		Path target = get("dir_target_test_unit");
+		createDirectories(source);
+		createDirectories(subDir);
+		createDirectories(target);
+		Parameter parameter = Parameter.builder()
+				.active(true)
+				.hourJob("15,20")
+				.dataSource(TXT)
+				.fileDelimiter(";")
+				.dirSource("dir_source_test_unit")
+				.dirTarget("dir_target_test_unit")
+				.build();
+		List<String> listErrors = underTest.validate(parameter);
+		delete(subDir);
+		delete(source);
+		delete(target);
+		
+		assertThat(listErrors).isEmpty();
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDbValid_thenReturnListEmpty() throws Exception {
+		Parameter parameter = Parameter.builder()
+				.active(true)
+				.hourJob("15,20")
+				.dataSource(DB)
+				.bdDriver("driver")
+				.bdPass("pass")
+				.bdUser("user")
+				.bdSql("sql")
+				.bdUrl("url")
+				.sgbd("sgbd")
+				.build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		assertThat(listErrors).isEmpty();
 	}
 }
