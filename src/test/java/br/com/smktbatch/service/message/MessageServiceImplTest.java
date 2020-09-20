@@ -17,7 +17,7 @@ public class MessageServiceImplTest {
 	private final MessageServiceImpl underTest = new MessageServiceImpl(this.mockMessageRepository);
 
 	@Test
-	public void whenGetByCode_givenAnyCode_thenReturnDescription() {
+	public void whenGetByCode_givenACode_thenReturnDescription() {
 		willReturn("desc").given(mockMessage).getDescription();
 		willReturn(mockMessage).given(mockMessageRepository).findByCode("code");
 		

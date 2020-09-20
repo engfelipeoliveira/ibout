@@ -19,7 +19,7 @@ public class ParameterServiceImplTest {
 	private final ParameterServiceImpl underTest = new ParameterServiceImpl(this.mockParameterRepository, mockMessageService);
 
 	@Test
-	public void whenGetByCode_givenAnyCode_thenReturnDescription() throws Exception {
+	public void whenGetByClientToken_givenAToken_thenReturnParameter() throws Exception {
 		willReturn(mockParameter).given(mockParameterRepository).findByClientToken("token");
 		
 		Parameter parameter = underTest.getByClientToken("token");

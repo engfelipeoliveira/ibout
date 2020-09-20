@@ -17,7 +17,7 @@ public class MappingServiceImplTest {
 	private final MappingServiceImpl underTest = new MappingServiceImpl(this.mockMappingRepository);
 
 	@Test
-	public void whenGetByCode_givenAnyCode_thenReturnDescription() {
+	public void whenGetByClientConde_givenAToken_thenReturnMapping() {
 		willReturn(mockMapping).given(mockMappingRepository).findByClientToken("token");
 		
 		Mapping mapping = underTest.getByClientToken("token");
