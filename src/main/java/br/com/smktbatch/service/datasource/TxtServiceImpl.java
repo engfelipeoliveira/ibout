@@ -1,7 +1,6 @@
 package br.com.smktbatch.service.datasource;
 
 import static br.com.smktbatch.enums.DataSource.TXT;
-import static br.com.smktbatch.model.local.Product.builder;
 import static br.com.smktbatch.service.datasource.FileUtils.filterFile;
 import static br.com.smktbatch.service.datasource.FileUtils.moveFile;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -63,7 +62,7 @@ public class TxtServiceImpl implements DataSourceService {
 	
 	private Product map(Mapping mapping, String line, String fileDelimiter) {
 		String[] columns = split(line, fileDelimiter);
-		return builder()
+		return Product.builder()
 				.clientId(mapping.getClient().getId())
 				.code(columns[mapping.getCode()] != null ? trimToNull(columns[mapping.getCode()]) : null)
 				.brand(columns[mapping.getBrand()] != null ? trimToNull(columns[mapping.getBrand()]) : null)

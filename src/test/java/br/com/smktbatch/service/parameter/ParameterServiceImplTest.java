@@ -4,7 +4,6 @@ import static br.com.smktbatch.enums.DataSource.CSV;
 import static br.com.smktbatch.enums.DataSource.INVALIDO;
 import static br.com.smktbatch.enums.DataSource.TXT;
 import static br.com.smktbatch.enums.DataSource.XLS;
-import static br.com.smktbatch.model.remote.Parameter.builder;
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.delete;
@@ -49,7 +48,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterActiveFalse_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.status.job.inactive");
-		Parameter parameter = builder().active(false).build();
+		Parameter parameter = Parameter.builder().active(false).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.status.job.inactive");
@@ -59,7 +58,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterJobHourNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.null");
-		Parameter parameter = builder().hourJob(null).build();
+		Parameter parameter = Parameter.builder().hourJob(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.hourjob.null");
@@ -69,7 +68,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterJobHourGreaterThan23_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
-		Parameter parameter = builder().hourJob("25").build();
+		Parameter parameter = Parameter.builder().hourJob("25").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
@@ -79,7 +78,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterJobHourSmallerThan0_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
-		Parameter parameter = builder().hourJob("-2").build();
+		Parameter parameter = Parameter.builder().hourJob("-2").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
@@ -89,7 +88,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.datasource.null");
-		Parameter parameter = builder().dataSource(null).build();
+		Parameter parameter = Parameter.builder().dataSource(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.datasource.null");
@@ -99,7 +98,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceInvalid_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.datasource.invalid");
-		Parameter parameter = builder().dataSource(INVALIDO).build();
+		Parameter parameter = Parameter.builder().dataSource(INVALIDO).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.datasource.invalid");
@@ -109,7 +108,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceTxtAndFileDelimiterNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.delimiter.file.null");
-		Parameter parameter = builder().dataSource(TXT).fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.delimiter.file.null");
@@ -119,7 +118,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceTxtAndDirSourceNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.null");
-		Parameter parameter = builder().dataSource(TXT).dirSource(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.null");
@@ -129,7 +128,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceCsvAndDirSourceNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.null");
-		Parameter parameter = builder().dataSource(CSV).dirSource(null).build();
+		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.null");
@@ -139,7 +138,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceXlsAndDirSourceNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.null");
-		Parameter parameter = builder().dataSource(XLS).dirSource(null).build();
+		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.null");
@@ -149,7 +148,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceTxtAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = builder().dataSource(TXT).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -159,7 +158,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceCsvAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = builder().dataSource(CSV).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -169,7 +168,7 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceXlsAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = builder().dataSource(XLS).dirSource("invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("invalid_dir_not_exists").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
@@ -181,7 +180,7 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = builder().dataSource(TXT).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(TXT).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		
@@ -194,7 +193,7 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = builder().dataSource(CSV).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(CSV).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		
@@ -207,7 +206,7 @@ public class ParameterServiceImplTest {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		Path path = get("temp_junit_dir_source");
 		createDirectories(path);
-		Parameter parameter = builder().dataSource(XLS).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		Parameter parameter = Parameter.builder().dataSource(XLS).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(path);
 		

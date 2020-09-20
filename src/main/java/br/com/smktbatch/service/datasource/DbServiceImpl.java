@@ -1,6 +1,5 @@
 package br.com.smktbatch.service.datasource;
 
-import static br.com.smktbatch.model.local.Product.builder;
 import static java.lang.Class.forName;
 import static java.sql.DriverManager.getConnection;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -49,7 +48,7 @@ public class DbServiceImpl implements DataSourceService {
 	}
 	
 	private Product map(Mapping mapping, ResultSet rs) throws SQLException {
-		return builder()
+		return Product.builder()
 				.clientId(mapping.getClient().getId())
 				.code(rs.getString(mapping.getCode() + 1) != null ? trimToNull(rs.getString(mapping.getCode() + 1)) : null)
 				.brand(rs.getString(mapping.getBrand() + 1) != null ? trimToNull(rs.getString(mapping.getBrand() + 1)) : null)
