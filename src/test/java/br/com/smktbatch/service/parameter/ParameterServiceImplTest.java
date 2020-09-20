@@ -6,10 +6,14 @@ import static br.com.smktbatch.enums.DataSource.TXT;
 import static br.com.smktbatch.enums.DataSource.XLS;
 import static br.com.smktbatch.model.remote.Parameter.builder;
 import static com.google.common.truth.Truth.assertThat;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Paths.get;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.Test;
@@ -165,10 +169,49 @@ public class ParameterServiceImplTest {
 	@Test
 	public void whenValidate_givenParameterDataSourceXlsAndDirSourceNotExistsNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
-		Parameter parameter = builder().dataSource(XLS).dirSource("c:\\invalid_dir_not_exists").fileDelimiter(null).build();
+		Parameter parameter = builder().dataSource(XLS).dirSource("invalid_dir_not_exists").fileDelimiter(null).build();
 		List<String> listErrors = underTest.validate(parameter);
 		
 		verify(mockMessageService).getByCode("msg.error.validation.directory.source.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceTxtAndDirSourceIsEmpty_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
+		Path path = get("temp_junit_dir_source");
+		createDirectories(path);
+		Parameter parameter = builder().dataSource(TXT).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		delete(path);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceCsvAndDirSourceIsEmpty_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
+		Path path = get("temp_junit_dir_source");
+		createDirectories(path);
+		Parameter parameter = builder().dataSource(CSV).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		delete(path);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
+	public void whenValidate_givenParameterDataSourceXlsAndDirSourceIsEmpty_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
+		Path path = get("temp_junit_dir_source");
+		createDirectories(path);
+		Parameter parameter = builder().dataSource(XLS).dirSource("temp_junit_dir_source").fileDelimiter(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		delete(path);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.directory.source.empty");
 		assertThat(listErrors).contains("msg");
 	}
 }
