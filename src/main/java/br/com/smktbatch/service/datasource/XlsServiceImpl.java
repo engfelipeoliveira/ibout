@@ -2,6 +2,7 @@ package br.com.smktbatch.service.datasource;
 
 import static br.com.smktbatch.enums.DataSource.XLS;
 import static br.com.smktbatch.enums.DataSource.XLSX;
+import static br.com.smktbatch.model.local.Product.builder;
 import static br.com.smktbatch.service.datasource.FileUtils.filterFile;
 import static br.com.smktbatch.service.datasource.FileUtils.moveFile;
 import static org.apache.commons.lang3.StringUtils.split;
@@ -88,7 +89,7 @@ public class XlsServiceImpl implements DataSourceService {
 		row.getCell(mapping.getDescription()).setCellType(STRING);
 		row.getCell(mapping.getName()).setCellType(STRING);
 		row.getCell(mapping.getPrice()).setCellType(STRING);
-		return Product.builder()
+		return builder()
 				.clientId(mapping.getClient().getId())
 				.code(row.getCell(mapping.getCode()) != null ? trimToNull(row.getCell(mapping.getCode()).getStringCellValue()) : null)
 				.brand(row.getCell(mapping.getBrand()) != null ? trimToNull(row.getCell(mapping.getBrand()).getStringCellValue()) : null)

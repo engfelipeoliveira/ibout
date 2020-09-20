@@ -1,6 +1,7 @@
 package br.com.smktbatch.service.datasource;
 
 import static br.com.smktbatch.enums.DataSource.CSV;
+import static br.com.smktbatch.model.local.Product.builder;
 import static br.com.smktbatch.service.datasource.FileUtils.filterFile;
 import static br.com.smktbatch.service.datasource.FileUtils.moveFile;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
@@ -62,7 +63,7 @@ public class CsvServiceImpl implements DataSourceService {
 	}
 	
 	private Product map(Mapping mapping, String[] line) {
-		return Product.builder()
+		return builder()
 				.clientId(mapping.getClient().getId())
 				.code(line[mapping.getCode()] != null ? trimToNull(line[mapping.getCode()]) : null)
 				.brand(line[mapping.getBrand()] != null ? trimToNull(line[mapping.getBrand()]) : null)

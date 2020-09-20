@@ -47,13 +47,15 @@ public class ParameterServiceImpl implements ParameterService {
 		if (parameter != null) {
 
 			if (!parameter.isActive()) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.status.job.inactive"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.status.job.inactive"));
+				String msg = this.messageService.getByCode("msg.error.validation.status.job.inactive");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getHourJob() == null) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.hourjob.null"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.hourjob.null"));
+				String msg = this.messageService.getByCode("msg.error.validation.hourjob.null");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getHourJob() != null) {
@@ -61,76 +63,87 @@ public class ParameterServiceImpl implements ParameterService {
 					try {
 						Long hLong = parseLong(h);
 						if(hLong < 0L || hLong > 23L) {
-							LOG.error(this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23"));
-							listErrors.add(this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23"));
+							String msg = this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23");
+							LOG.error(msg);
+							listErrors.add(msg);
 						}						
 					} catch (Exception e) {
-						LOG.error(this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23"));
-						listErrors.add(this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23"));
+						String msg = this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23");
+						LOG.error(msg);
+						listErrors.add(msg);
 					}
 				});
 			}
 
 			if (parameter.getDataSource() == null) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.datasource.null"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.datasource.null"));
+				String msg = this.messageService.getByCode("msg.error.validation.datasource.null");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && !TXT.equals(parameter.getDataSource()) && !CSV.equals(parameter.getDataSource())
 					&& !DB.equals(parameter.getDataSource()) && !XLS.equals(parameter.getDataSource())) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.datasource.invalid"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.datasource.invalid"));
+				String msg = this.messageService.getByCode("msg.error.validation.datasource.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && TXT.equals(parameter.getDataSource()) && isBlank(parameter.getFileDelimiter())) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.delimiter.file.null"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.delimiter.file.null"));
+				String msg = this.messageService.getByCode("msg.error.validation.delimiter.file.null");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && isBlank(parameter.getDirSource()) && (TXT.equals(parameter.getDataSource())
 					|| CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.null"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.null"));
+				String msg = this.messageService.getByCode("msg.error.validation.directory.source.null");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && !new File(parameter.getDirSource()).exists()
 					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.invalid"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.invalid"));
+				String msg = this.messageService.getByCode("msg.error.validation.directory.source.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 			
-			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && (TXT.equals(parameter.getDataSource()) 
+			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && new File(parameter.getDirSource()).exists() && 
+					new File(parameter.getDirSource()).listFiles().length == 0 && (TXT.equals(parameter.getDataSource()) 
 					|| CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
 				
-				if(new File(parameter.getDirSource()).listFiles().length == 0) {
-					LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.empty"));
-					listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.empty"));	
-				}
+					String msg = this.messageService.getByCode("msg.error.validation.directory.source.empty");
+					LOG.error(msg);
+					listErrors.add(msg);	
 			}
 
 			if (parameter.getDataSource() != null && isBlank(parameter.getDirTarget()) && parameter.isMoveFileAfterRead()
 					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.directory.target.null"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.target.null"));
+				String msg = this.messageService.getByCode("msg.error.validation.directory.target.null");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && !isBlank(parameter.getDirTarget()) && parameter.isMoveFileAfterRead() && !new File(parameter.getDirTarget()).exists()
 					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.directory.target.invalid"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.target.invalid"));
+				String msg = this.messageService.getByCode("msg.error.validation.directory.target.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && !isBlank(parameter.getDirTarget()) 
 					&& parameter.isMoveFileAfterRead() && parameter.getDirSource().equalsIgnoreCase(parameter.getDirTarget())
 					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.target.equals"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.target.equals"));
+				String msg = this.messageService.getByCode("msg.error.validation.directory.source.target.equals");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 			
 			if (parameter.getDataSource() != null && DB.equals(parameter.getDataSource())
 					&& isAnyBlank(new String[] { parameter.getSgbd(), parameter.getBdUrl(), parameter.getBdDriver(), parameter.getBdUser(), parameter.getBdPass(), parameter.getBdSql() })) {
-				LOG.error(this.messageService.getByCode("msg.error.validation.database.invalid"));
-				listErrors.add(this.messageService.getByCode("msg.error.validation.database.invalid"));
+				String msg = this.messageService.getByCode("msg.error.validation.database.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 
 		}

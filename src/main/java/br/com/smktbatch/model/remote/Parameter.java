@@ -9,12 +9,14 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import br.com.smktbatch.enums.DataSource;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
 @Entity
 @Getter
 @ToString
+@Builder
 public class Parameter implements Serializable {
 
 	/**
