@@ -33,7 +33,7 @@ public class RemoteConfig {
 	
 	@Value("${remote.jdbc.pass}")
 	private String jdbcPass;
-
+	
 	@Bean
 	@Primary
 	public LocalContainerEntityManagerFactoryBean remoteEntityManager() {

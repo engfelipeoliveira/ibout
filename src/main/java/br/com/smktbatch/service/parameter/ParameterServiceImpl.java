@@ -12,7 +12,6 @@ import static org.apache.commons.lang3.StringUtils.split;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,13 +102,7 @@ public class ParameterServiceImpl implements ParameterService {
 			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && (TXT.equals(parameter.getDataSource()) 
 					|| CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
 				
-				FilenameFilter filter = new FilenameFilter() {
-					public boolean accept(File dir, String name) {
-						return name.toUpperCase().contains(parameter.getDataSource().toString());
-					}
-				};
-
-				if(new File(parameter.getDirSource()).listFiles(filter).length == 0) {
+				if(new File(parameter.getDirSource()).listFiles().length == 0) {
 					LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.empty"));
 					listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.empty"));	
 				}
