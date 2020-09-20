@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -56,17 +57,26 @@ public class XlsServiceImpl implements DataSourceService {
 			String[] sheets = split(parameter.getExcelSheet(), ",");
 			for(String sheetName : sheets) {
 				sheet = workbook.getSheet(sheetName);
-				for (Row row : sheet) {
-					listProduct.add(this.map(mapping, row));
+				Iterator<Row> rowIterator = sheet.iterator();
+				if(parameter.isHeader()) {
+					rowIterator.next();
+				}
+				while (rowIterator.hasNext()) {
+					listProduct.add(this.map(mapping, rowIterator.next()));
 				}
 			}
 		}else {
 			sheet = workbook.getSheetAt(0);
-			for (Row row : sheet) {
-				listProduct.add(this.map(mapping, row));
+			Iterator<Row> rowIterator = sheet.iterator();
+			if(parameter.isHeader()) {
+				rowIterator.next();
+			}
+			while (rowIterator.hasNext()) {
+				listProduct.add(this.map(mapping, rowIterator.next()));
 			}
 		}
 		workbook.close();
+		fileInputStream.close();
 			
 		return listProduct;
 	}
