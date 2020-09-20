@@ -105,7 +105,7 @@ public class ParameterServiceImpl implements ParameterService {
 				
 				FilenameFilter filter = new FilenameFilter() {
 					public boolean accept(File dir, String name) {
-						return name.toUpperCase().endsWith(parameter.getDataSource().toString());
+						return name.toUpperCase().contains(parameter.getDataSource().toString());
 					}
 				};
 
@@ -125,6 +125,13 @@ public class ParameterServiceImpl implements ParameterService {
 					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
 				LOG.error(this.messageService.getByCode("msg.error.validation.directory.target.invalid"));
 				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.target.invalid"));
+			}
+
+			if (parameter.getDataSource() != null && !isBlank(parameter.getDirSource()) && !isBlank(parameter.getDirTarget()) 
+					&& parameter.isMoveFileAfterRead() && parameter.getDirSource().equalsIgnoreCase(parameter.getDirTarget())
+					&& (TXT.equals(parameter.getDataSource()) || CSV.equals(parameter.getDataSource()) || XLS.equals(parameter.getDataSource()))) {
+				LOG.error(this.messageService.getByCode("msg.error.validation.directory.source.target.equals"));
+				listErrors.add(this.messageService.getByCode("msg.error.validation.directory.source.target.equals"));
 			}
 			
 			if (parameter.getDataSource() != null && DB.equals(parameter.getDataSource())
