@@ -2,7 +2,6 @@ package br.com.smktbatch.service.datasource;
 
 import static java.lang.Class.forName;
 import static java.sql.DriverManager.getConnection;
-import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 import java.sql.Connection;
