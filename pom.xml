@@ -14,11 +14,24 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>smkt-batch</name>
 	<description>smktbatch</description>
-
+	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
-
+	<url>https://github.com/engfelipeoliveira/smkt-batch</url>
+	<scm>
+		<connection>scm:git:git://github.com/engfelipeoliveira/smkt-batch.git</connection>
+		<developerConnection>scm:git:git@github.com:engfelipeoliveira/smkt-batch.git</developerConnection>
+		<url>https://github.com/engfelipeoliveira/smkt-batch</url>
+		<tag>${scmtag}</tag>
+	</scm>	
+	<developers>
+		<developer>
+			<id>cvfelipeoliveira</id>
+			<name>Felipe Oliveira</name>
+			<email>cvfelipeoliveira@gmail.com</email>
+		</developer>
+	</developers>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -116,6 +129,19 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jcenter</id>
+			<url>https://zerobug.jfrog.io/artifactory/jcenter/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jcenter</id>
+			<url>https://zerobug.jfrog.io/artifactory/jcenter/</url>
+		</pluginRepository>
+	</pluginRepositories>	
 
 	<build>
 		<plugins>
