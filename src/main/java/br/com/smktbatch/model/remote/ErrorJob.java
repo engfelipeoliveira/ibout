@@ -37,6 +37,8 @@ public class ErrorJob implements Serializable {
 	
 	private String stackTrace;
 	
+	private String json;
+	
 	@ManyToOne
 	private Job job;
 }

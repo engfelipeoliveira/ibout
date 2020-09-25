@@ -23,14 +23,13 @@ import br.com.smktbatch.model.remote.Parameter;
 public class ApiClientServiceImpl implements ApiClientService {
 	
 	@Override
-	public void callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException {
+	public String callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
+		String result = null;
 		try {
 			HttpPost httpPost = new HttpPost(format("%s%s/%s", parameter.getApiUrlInsertProduct(), idClient, tokenClient));
 			Gson gson = new Gson();
 			String json = gson.toJson(requestInsertProductDto);
-			
-			System.out.println(json);
 			
 			StringEntity entity = new StringEntity(json);
 			httpPost.setEntity(entity);
@@ -38,12 +37,13 @@ public class ApiClientServiceImpl implements ApiClientService {
 			CloseableHttpResponse response = httpClient.execute(httpPost);
 
 			if (response.getStatusLine().getStatusCode() == 200) {
-				String result = EntityUtils.toString(response.getEntity());
-				System.out.println(result);
+				result = EntityUtils.toString(response.getEntity());
 			}
 		} finally {
 			httpClient.close();
 		}
+		
+		return result;
 	}
 
 }

@@ -23,9 +23,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 import br.com.smktbatch.dto.RequestInsertProductDto;
 import br.com.smktbatch.enums.DataSource;
@@ -106,7 +109,9 @@ public class MainServiceImpl implements MainService {
 								productService.deleteAll();
 							}
 							
-							createProduct(parameter, mapping, tokenClient, idClient, job);							
+							createProduct(parameter, mapping, tokenClient, idClient, job);
+							job = job.toBuilder().status(job.getStatus() != null ? job.getStatus() : SUCESSO).endTime(now()).build();
+							this.jobService.createOrUpdate(job);
 							
 						} catch (Exception e) {
 							String msg = messageService.getByCode("msg.error.read.file");
@@ -159,23 +164,32 @@ public class MainServiceImpl implements MainService {
 		});
 		
 		callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
-		this.jobService.createOrUpdate(job);
+		
 	}
 	
-	private void callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
+	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
+		String returnApi = null;
 		try {
-			this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
-			job = job.toBuilder().endTime(now()).status(SUCESSO).build();
-			LOG.info("Processo finalizado com sucesso");
+			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
+			LOG.info(returnApi);
+			
+			if(StringUtils.length(returnApi) > 200) {
+				Gson gson = new Gson();
+				String json = gson.toJson(listRequestInsertProductDto);
+				ErrorJob error = ErrorJob.builder().job(job).json(json).stackTrace(returnApi).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
+				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
+			}
 		} catch (ClientProtocolException e) {
 			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
-			job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
-			LOG.error("Processo finalizado com erro");
+			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 		} catch (IOException e) {
 			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
-			job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
-			LOG.error("Processo finalizado com erro");
+			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 		}
+		
+		this.jobService.createOrUpdate(job);
+		
+		return returnApi;
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {

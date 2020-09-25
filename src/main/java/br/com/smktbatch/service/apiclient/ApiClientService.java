@@ -10,6 +10,6 @@ import br.com.smktbatch.model.remote.Parameter;
 
 public interface ApiClientService {
 	
-	void callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException;
+	String callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException;
 
 }
