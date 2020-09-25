@@ -35,17 +35,36 @@ public class Product implements Serializable {
 	@EqualsAndHashCode.Exclude
 	private Long id;
 	
-	private Long clientId;
-
 	private String code;
 
-	private String name;
-
-	private String brand;
-
 	private String description;
-
+	
+	private String brand;
+	
 	private String complement;
+	
+	private String groupProduct;
 
 	private String price;
+	
+	private String priceSold;
+	
+	private String priceClub;
+	
+	private String sold;
+
+	private String stock;
+	
+	private String internalCode;
+	
+	private Long idClient;
+	
+	private String bowl;
+	
+	private String photo;
+	
+	private String unit;
+	
+	private String visible;
+	
 }

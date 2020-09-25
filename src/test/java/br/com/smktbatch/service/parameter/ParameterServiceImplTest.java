@@ -31,11 +31,11 @@ public class ParameterServiceImplTest {
 
 	@Test
 	public void whenGetByClientToken_givenAToken_thenReturnParameter() throws Exception {
-		willReturn(mockParameter).given(mockParameterRepository).findByClientToken("token");
+		willReturn(mockParameter).given(mockParameterRepository).findByIdClient(1L);
 		
-		Parameter parameter = underTest.getByClientToken("token");
+		Parameter parameter = underTest.getByIdClient(1L);
 		
-		verify(mockParameterRepository).findByClientToken("token");
+		verify(mockParameterRepository).findByIdClient(1L);
 		assertThat(parameter).isEqualTo(mockParameter);
 	}
 	
@@ -350,6 +350,7 @@ public class ParameterServiceImplTest {
 				.fileDelimiter(";")
 				.dirSource("dir_source_test_unit")
 				.dirTarget("dir_target_test_unit")
+				.apiUrlInsertProduct("apiUrlInsertProduct")
 				.build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(subDir);
@@ -371,6 +372,7 @@ public class ParameterServiceImplTest {
 				.bdSql("sql")
 				.bdUrl("url")
 				.sgbd("sgbd")
+				.apiUrlInsertProduct("apiUrlInsertProduct")
 				.build();
 		List<String> listErrors = underTest.validate(parameter);
 		

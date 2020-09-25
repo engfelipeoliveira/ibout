@@ -86,15 +86,13 @@ public class XlsServiceImpl implements DataSourceService {
 		row.getCell(mapping.getBrand()).setCellType(STRING);
 		row.getCell(mapping.getComplement()).setCellType(STRING);
 		row.getCell(mapping.getDescription()).setCellType(STRING);
-		row.getCell(mapping.getName()).setCellType(STRING);
 		row.getCell(mapping.getPrice()).setCellType(STRING);
 		return Product.builder()
-				.clientId(mapping.getClient().getId())
+				.idClient(mapping.getIdClient())
 				.code(row.getCell(mapping.getCode()) != null ? trimToNull(row.getCell(mapping.getCode()).getStringCellValue()) : null)
 				.brand(row.getCell(mapping.getBrand()) != null ? trimToNull(row.getCell(mapping.getBrand()).getStringCellValue()) : null)
 				.complement(row.getCell(mapping.getCode()) != null ? trimToNull(row.getCell(mapping.getComplement()).getStringCellValue()) : null)
 				.description(row.getCell(mapping.getDescription()) != null ? trimToNull(row.getCell(mapping.getDescription()).getStringCellValue()) : null)
-				.name(row.getCell(mapping.getName()) != null ? trimToNull(row.getCell(mapping.getName()).getStringCellValue()) : null)
 				.price(row.getCell(mapping.getPrice()) != null ? trimToNull(row.getCell(mapping.getPrice()).getStringCellValue()) : null)
 				.build();
 	}

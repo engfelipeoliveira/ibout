@@ -15,8 +15,8 @@ public class MappingServiceImpl implements MappingService {
 	}
 
 	@Override
-	public Mapping getByClientToken(String token) {
-		return mappingRepository.findByClientToken(token);
+	public Mapping getByIdClient(Long idClient) {
+		return mappingRepository.findByIdClient(idClient);
 	}
 
 }

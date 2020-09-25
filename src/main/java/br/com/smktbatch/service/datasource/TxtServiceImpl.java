@@ -63,14 +63,24 @@ public class TxtServiceImpl implements DataSourceService {
 	private Product map(Mapping mapping, String line, String fileDelimiter) {
 		String[] columns = split(line, fileDelimiter);
 		return Product.builder()
-				.clientId(mapping.getClient().getId())
+				.idClient(mapping.getIdClient())
 				.code(columns[mapping.getCode()] != null ? trimToNull(columns[mapping.getCode()]) : null)
+				.description(columns[mapping.getDescription()] != null ? trimToNull(columns[mapping.getDescription()]) : null)
 				.brand(columns[mapping.getBrand()] != null ? trimToNull(columns[mapping.getBrand()]) : null)
 				.complement(columns[mapping.getCode()] != null ? trimToNull(columns[mapping.getComplement()]) : null)
-				.description(columns[mapping.getDescription()] != null ? trimToNull(columns[mapping.getDescription()]) : null)
-				.name(columns[mapping.getName()] != null ? trimToNull(columns[mapping.getName()]) : null)
+				.groupProduct(columns[mapping.getGroupProduct()] != null ? trimToNull(columns[mapping.getGroupProduct()]) : null)
 				.price(columns[mapping.getPrice()] != null ? trimToNull(columns[mapping.getPrice()]) : null)
+				.priceSold(columns[mapping.getPriceSold()] != null ? trimToNull(columns[mapping.getPriceSold()]) : null)
+				.priceClub(columns[mapping.getPriceClub()] != null ? trimToNull(columns[mapping.getPriceClub()]) : null)
+				.sold(columns[mapping.getSold()] != null ? trimToNull(columns[mapping.getSold()]) : null)
+				.stock(columns[mapping.getStock()] != null ? trimToNull(columns[mapping.getStock()]) : null)
+				.internalCode(columns[mapping.getInternalCode()] != null ? trimToNull(columns[mapping.getInternalCode()]) : null)
+				.bowl(columns[mapping.getBowl()] != null ? trimToNull(columns[mapping.getBowl()]) : null)
+				.photo(columns[mapping.getPhoto()] != null ? trimToNull(columns[mapping.getPhoto()]) : null)
+				.unit(columns[mapping.getUnit()] != null ? trimToNull(columns[mapping.getUnit()]) : null)
+				.visible(columns[mapping.getVisible()] != null ? trimToNull(columns[mapping.getVisible()]) : null)
 				.build();
+		
 	}
 
 }

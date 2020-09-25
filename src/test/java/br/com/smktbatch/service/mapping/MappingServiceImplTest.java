@@ -18,11 +18,11 @@ public class MappingServiceImplTest {
 
 	@Test
 	public void whenGetByClientConde_givenAToken_thenReturnMapping() {
-		willReturn(mockMapping).given(mockMappingRepository).findByClientToken("token");
+		willReturn(mockMapping).given(mockMappingRepository).findByIdClient(1L);
 		
-		Mapping mapping = underTest.getByClientToken("token");
+		Mapping mapping = underTest.getByIdClient(1L);
 		
-		verify(mockMappingRepository).findByClientToken("token");
+		verify(mockMappingRepository).findByIdClient(1L);
 		assertThat(mapping).isEqualTo(mockMapping);
 	}
 

@@ -4,6 +4,6 @@ import br.com.smktbatch.model.remote.Mapping;
 
 public interface MappingService {
 	
-	Mapping getByClientToken(String token);
+	Mapping getByIdClient(Long idClient);
 
 }

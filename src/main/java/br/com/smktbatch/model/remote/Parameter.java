@@ -6,7 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 
 import br.com.smktbatch.enums.DataSource;
 import lombok.AllArgsConstructor;
@@ -32,8 +31,7 @@ public class Parameter implements Serializable {
 	@Id
 	private Long id;
 
-	@OneToOne(targetEntity = Client.class, optional = false)
-	private Client client;
+	private Long idClient;
 
 	@Enumerated(EnumType.STRING)
 	private DataSource dataSource;
@@ -70,5 +68,8 @@ public class Parameter implements Serializable {
 	private String bdPass;
 	
 	private String bdSql;
+	
+	// API
+	private String apiUrlInsertProduct;
 
 }

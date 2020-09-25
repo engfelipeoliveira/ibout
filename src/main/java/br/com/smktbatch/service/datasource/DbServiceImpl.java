@@ -49,12 +49,11 @@ public class DbServiceImpl implements DataSourceService {
 	
 	private Product map(Mapping mapping, ResultSet rs) throws SQLException {
 		return Product.builder()
-				.clientId(mapping.getClient().getId())
+				.idClient(mapping.getIdClient())
 				.code(rs.getString(mapping.getCode() + 1) != null ? trimToNull(rs.getString(mapping.getCode() + 1)) : null)
 				.brand(rs.getString(mapping.getBrand() + 1) != null ? trimToNull(rs.getString(mapping.getBrand() + 1)) : null)
 				.complement(rs.getString(mapping.getComplement() + 1) != null ? trimToNull(rs.getString(mapping.getComplement() + 1)) : null)
 				.description(rs.getString(mapping.getDescription() + 1) != null ? trimToNull(rs.getString(mapping.getDescription() + 1)) : null)
-				.name(rs.getString(mapping.getName() + 1) != null ? trimToNull(rs.getString(mapping.getName() + 1)) : null)
 				.price(rs.getString(mapping.getPrice() + 1) != null ? trimToNull(rs.getString(mapping.getPrice() + 1)) : null)
 				.build();
 	}

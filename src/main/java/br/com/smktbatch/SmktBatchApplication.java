@@ -1,5 +1,7 @@
 package br.com.smktbatch;
 
+import static java.lang.Long.parseLong;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +16,7 @@ public class SmktBatchApplication implements CommandLineRunner {
 
 	private final MainService mainService;
 	private String tokenClient;
+	private Long idClient;
 
 	public SmktBatchApplication(MainService mainService) {
 		this.mainService = mainService;
@@ -25,13 +28,13 @@ public class SmktBatchApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		args[0] = "abc";
-		tokenClient = args[0];		
+		tokenClient = args[0];
+		idClient =  parseLong(args[1]);
 	}
 	
 	@Scheduled(initialDelay = 10000, fixedDelay = 10000)
 	private void execute() throws Exception {
-		mainService.execute(tokenClient);
+		mainService.execute(tokenClient, idClient);
 	}
 
 }

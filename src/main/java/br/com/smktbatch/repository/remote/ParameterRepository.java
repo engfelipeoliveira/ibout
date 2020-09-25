@@ -8,6 +8,6 @@ import br.com.smktbatch.model.remote.Parameter;
 @Repository
 public interface ParameterRepository extends JpaRepository<Parameter , Long> {
 	
-	Parameter findByClientToken(String token);
+	Parameter findByIdClient(Long idClient);
 
 }

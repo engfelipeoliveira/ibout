@@ -63,12 +63,11 @@ public class CsvServiceImpl implements DataSourceService {
 	
 	private Product map(Mapping mapping, String[] line) {
 		return Product.builder()
-				.clientId(mapping.getClient().getId())
+				.idClient(mapping.getIdClient())
 				.code(line[mapping.getCode()] != null ? trimToNull(line[mapping.getCode()]) : null)
 				.brand(line[mapping.getBrand()] != null ? trimToNull(line[mapping.getBrand()]) : null)
 				.complement(line[mapping.getCode()] != null ? trimToNull(line[mapping.getComplement()]) : null)
 				.description(line[mapping.getDescription()] != null ? trimToNull(line[mapping.getDescription()]) : null)
-				.name(line[mapping.getName()] != null ? trimToNull(line[mapping.getName()]) : null)
 				.price(line[mapping.getPrice()] != null ? trimToNull(line[mapping.getPrice()]) : null)
 				.build();
 	}

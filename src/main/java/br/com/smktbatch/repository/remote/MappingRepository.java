@@ -8,6 +8,6 @@ import br.com.smktbatch.model.remote.Mapping;
 @Repository
 public interface MappingRepository extends JpaRepository<Mapping, Long> {
 	
-	Mapping findByClientToken(String token);
+	Mapping findByIdClient(Long idClient);
 	
 }

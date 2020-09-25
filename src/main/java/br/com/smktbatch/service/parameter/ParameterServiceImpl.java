@@ -36,8 +36,8 @@ public class ParameterServiceImpl implements ParameterService {
 	}
 
 	@Override
-	public Parameter getByClientToken(String token) throws Exception {
-		return this.parameterRepository.findByClientToken(token);
+	public Parameter getByIdClient(Long idClient) throws Exception {
+		return this.parameterRepository.findByIdClient(idClient);
 	}
 
 	@Override
@@ -145,7 +145,12 @@ public class ParameterServiceImpl implements ParameterService {
 				LOG.error(msg);
 				listErrors.add(msg);
 			}
-
+			
+			if (isBlank(parameter.getApiUrlInsertProduct())) {
+				String msg = this.messageService.getByCode("msg.error.validation.api.url.insert.products.null");
+				LOG.error(msg);
+				listErrors.add(msg);
+			}
 		}
 
 		return listErrors;
