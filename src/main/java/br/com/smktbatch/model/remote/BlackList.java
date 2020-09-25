@@ -13,7 +13,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @ToString
-public class Mapping implements Serializable {
+public class BlackList implements Serializable {
 
 	/**
 	 * 
@@ -26,34 +26,6 @@ public class Mapping implements Serializable {
 	
 	private Long idClient;
 
-	private int code;
-
-	private int description;
-	
-	private int brand;
-	
-	private int complement;
-	
-	private int groupProduct;
-
-	private int price;
-	
-	private int priceSold;
-	
-	private int priceClub;
-	
-	private int sold;
-
-	private int stock;
-	
-	private int internalCode;
-	
-	private int bowl;
-	
-	private int photo;
-	
-	private int unit;
-	
-	private int visible;
+	private String code;
 
 }

@@ -34,6 +34,9 @@ public class RemoteConfig {
 	@Value("${remote.jdbc.pass}")
 	private String jdbcPass;
 	
+	@Value("${remote.jdbc.dialect}")
+	private String dialect;
+	
 	@Bean
 	@Primary
 	public LocalContainerEntityManagerFactoryBean remoteEntityManager() {
@@ -45,6 +48,7 @@ public class RemoteConfig {
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
 		properties.put("hibernate.hbm2ddl.auto", hibernateHbm2ddlAuto);
+		properties.put("hibernate.dialect", dialect);
 		em.setJpaPropertyMap(properties);
 
 		return em;

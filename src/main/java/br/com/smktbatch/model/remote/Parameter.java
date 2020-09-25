@@ -71,5 +71,7 @@ public class Parameter implements Serializable {
 	
 	// API
 	private String apiUrlInsertProduct;
+	
+	private String apiSizeArrayInsertProduct;
 
 }

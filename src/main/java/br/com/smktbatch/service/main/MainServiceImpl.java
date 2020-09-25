@@ -9,6 +9,7 @@ import static br.com.smktbatch.enums.StatusJob.ERRO;
 import static br.com.smktbatch.enums.StatusJob.INICIADO;
 import static br.com.smktbatch.enums.StatusJob.SUCESSO;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -29,11 +30,13 @@ import org.springframework.stereotype.Service;
 import br.com.smktbatch.dto.RequestInsertProductDto;
 import br.com.smktbatch.enums.DataSource;
 import br.com.smktbatch.model.local.Product;
+import br.com.smktbatch.model.remote.BlackList;
 import br.com.smktbatch.model.remote.ErrorJob;
 import br.com.smktbatch.model.remote.Job;
 import br.com.smktbatch.model.remote.Mapping;
 import br.com.smktbatch.model.remote.Parameter;
 import br.com.smktbatch.service.apiclient.ApiClientService;
+import br.com.smktbatch.service.blacklist.BlackListService;
 import br.com.smktbatch.service.datasource.CsvServiceImpl;
 import br.com.smktbatch.service.datasource.DataSourceService;
 import br.com.smktbatch.service.datasource.DbServiceImpl;
@@ -54,17 +57,19 @@ public class MainServiceImpl implements MainService {
 	private final MessageService messageService;
 	private final ProductService productService;
 	private final ApiClientService apiClientService;
+	private final BlackListService blackListService;
 
 	private static final Logger LOG = getLogger(MainServiceImpl.class);
 
 	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService,
-			MessageService messageService, ProductService productService, ApiClientService apiClientService) {
+			MessageService messageService, ProductService productService, ApiClientService apiClientService, BlackListService blackListService) {
 		this.parameterService = parameterService;
 		this.jobService = jobService;
 		this.mappingService = mappingService;
 		this.messageService = messageService;
 		this.productService = productService;
 		this.apiClientService = apiClientService;
+		this.blackListService = blackListService;
 	}
 
 	@Override
@@ -132,21 +137,36 @@ public class MainServiceImpl implements MainService {
 	private void createProduct(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job) throws Exception {
 		LOG.info("Comparando e criando produtos");
 		List<RequestInsertProductDto> listRequestInsertProductDto = new ArrayList<RequestInsertProductDto>();
+		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
+		List<Product> productsSaved = this.productService.getAll();
+		
 		dataSourceFactory(parameter.getDataSource()).read(parameter, mapping).stream().forEach(product ->{
-			Product productSaved = this.productService.getAll().stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
-			if(productSaved == null) {
-				listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
-			}else if(!productSaved.equals(product)){
-				LOG.info(product.toString());
-				product.setId(productSaved.getId());
-				listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
+			
+			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(product.getCode())).findFirst().isPresent()) {
+				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
+				if(productSaved == null) {
+					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
+					System.out.println(product.getCode());
+				}else if(!productSaved.equals(product)){
+					product.setId(productSaved.getId());
+					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
+				}
+			}
+			
+			if(!listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
+				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
+				listRequestInsertProductDto.clear();
 			}
 		});
 		
+		callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
+		this.jobService.createOrUpdate(job);
+	}
+	
+	private void callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
 		try {
 			this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
 			job = job.toBuilder().endTime(now()).status(SUCESSO).build();
-			this.jobService.createOrUpdate(job);
 			LOG.info("Processo finalizado com sucesso");
 		} catch (ClientProtocolException e) {
 			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
@@ -157,7 +177,6 @@ public class MainServiceImpl implements MainService {
 			job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
 			LOG.error("Processo finalizado com erro");
 		}
-		this.jobService.createOrUpdate(job);
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {

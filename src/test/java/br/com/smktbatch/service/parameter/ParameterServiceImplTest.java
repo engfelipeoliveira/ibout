@@ -336,6 +336,36 @@ public class ParameterServiceImplTest {
 	}
 	
 	@Test
+	public void whenValidate_givenParameterApiSizeArrayInsertProductNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		Parameter parameter = Parameter.builder().apiSizeArrayInsertProduct(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
+	public void whenValidate_givenParameterApiUrlInsertProductSizeNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.url.insert.products.null");
+		Parameter parameter = Parameter.builder().apiUrlInsertProduct(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.api.url.insert.products.null");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
+	public void whenValidate_givenParameterApiUrlInsertProductSizeNotNumeric_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		Parameter parameter = Parameter.builder().apiUrlInsertProduct("X").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
 	public void whenValidate_givenParameterFileValid_thenReturnListEmpty() throws Exception {
 		Path source = get("dir_source_test_unit");
 		Path subDir = get("dir_source_test_unit/1");
@@ -351,6 +381,7 @@ public class ParameterServiceImplTest {
 				.dirSource("dir_source_test_unit")
 				.dirTarget("dir_target_test_unit")
 				.apiUrlInsertProduct("apiUrlInsertProduct")
+				.apiSizeArrayInsertProduct("100")
 				.build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(subDir);
@@ -373,6 +404,7 @@ public class ParameterServiceImplTest {
 				.bdUrl("url")
 				.sgbd("sgbd")
 				.apiUrlInsertProduct("apiUrlInsertProduct")
+				.apiSizeArrayInsertProduct("1")
 				.build();
 		List<String> listErrors = underTest.validate(parameter);
 		

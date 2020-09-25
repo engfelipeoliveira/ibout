@@ -1,5 +1,7 @@
 package br.com.smktbatch.service.apiclient;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -24,9 +26,11 @@ public class ApiClientServiceImpl implements ApiClientService {
 	public void callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		try {
-			HttpPost httpPost = new HttpPost(parameter.getApiUrlInsertProduct() + idClient + "/" + tokenClient);
+			HttpPost httpPost = new HttpPost(format("%s%s/%s", parameter.getApiUrlInsertProduct(), idClient, tokenClient));
 			Gson gson = new Gson();
-			String json = gson.toJson(requestInsertProductDto); 
+			String json = gson.toJson(requestInsertProductDto);
+			
+			System.out.println(json);
 			
 			StringEntity entity = new StringEntity(json);
 			httpPost.setEntity(entity);
@@ -35,13 +39,11 @@ public class ApiClientServiceImpl implements ApiClientService {
 
 			if (response.getStatusLine().getStatusCode() == 200) {
 				String result = EntityUtils.toString(response.getEntity());
+				System.out.println(result);
 			}
 		} finally {
 			httpClient.close();
 		}
-		
-		
 	}
-
 
 }

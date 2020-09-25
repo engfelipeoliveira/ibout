@@ -151,6 +151,21 @@ public class ParameterServiceImpl implements ParameterService {
 				LOG.error(msg);
 				listErrors.add(msg);
 			}
+			
+			if (isBlank(parameter.getApiSizeArrayInsertProduct())) {
+				String msg = this.messageService.getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
+			}else {
+				try {
+					parseLong(parameter.getApiSizeArrayInsertProduct());	
+				} catch (Exception e) {
+					String msg = this.messageService.getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+					LOG.error(msg);
+					listErrors.add(msg);
+				}
+				
+			}
 		}
 
 		return listErrors;
