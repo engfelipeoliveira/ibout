@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com</groupId>
-	<artifactId>smktbatch</artifactId>
+	<artifactId>ibout</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>smkt-batch</name>
-	<description>smktbatch</description>
+	<name>ibout</name>
+	<description>ibout</description>
 	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
@@ -144,7 +144,7 @@
 		<repository>
 			<id>github</id>
 			<name>GitHub Packages</name>
-			<url>https://github.com/engfelipeoliveira/smkt-batch</url>
+			<url>https://github.com/engfelipeoliveira/iboutt-batch</url>
 		</repository>
 	</distributionManagement>
 </project>
