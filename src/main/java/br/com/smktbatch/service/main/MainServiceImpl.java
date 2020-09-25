@@ -146,7 +146,6 @@ public class MainServiceImpl implements MainService {
 				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
 				if(productSaved == null) {
 					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
-					System.out.println(product.getCode());
 				}else if(!productSaved.equals(product)){
 					product.setId(productSaved.getId());
 					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
