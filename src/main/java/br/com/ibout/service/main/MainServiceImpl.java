@@ -168,6 +168,7 @@ public class MainServiceImpl implements MainService {
 		
 		if(!listRequestInsertProductDto.isEmpty()) {
 			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);	
+			listRequestInsertProductDto.clear();
 		}
 	}
 	
@@ -176,7 +177,7 @@ public class MainServiceImpl implements MainService {
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
-			LOG.info("Retorno API " + returnApi);
+			LOG.info("Retorno API : " + returnApi);
 			
 			if(length(returnApi) > 500) {
 				LOG.error(new Gson().toJson(listRequestInsertProductDto));
