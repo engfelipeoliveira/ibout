@@ -14,6 +14,7 @@ import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.length;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -23,10 +24,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 import br.com.ibout.dto.RequestInsertProductDto;
 import br.com.ibout.enums.DataSource;
@@ -98,6 +100,7 @@ public class MainServiceImpl implements MainService {
 						String msg = messageService.getByCode("msg.error.validation.mapping.not.found");
 						ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 						job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
+						LOG.error(msg);
 						LOG.error("Processo finalizado com erro");
 					} else {
 						LOG.info(mapping.toString());
@@ -142,8 +145,7 @@ public class MainServiceImpl implements MainService {
 		List<RequestInsertProductDto> listRequestInsertProductDto = new ArrayList<RequestInsertProductDto>();
 		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
 		List<Product> productsSaved = this.productService.getAll();
-		
-		LOG.info("total de produtos na base " + productsSaved.size());
+		LOG.info("total de produtos na base local " + productsSaved.size());
 		
 		dataSourceFactory(parameter.getDataSource()).read(parameter, mapping).stream().forEach(product ->{
 			
@@ -172,20 +174,25 @@ public class MainServiceImpl implements MainService {
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
-			LOG.info(returnApi);
+			LOG.info("Retorno API " + returnApi);
 			
-			if(StringUtils.length(returnApi) > 200) {
-				//Gson gson = new Gson();
-				//String json = gson.toJson(listRequestInsertProductDto);
-				ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
+			if(length(returnApi) > 200) {
+				LOG.error(new Gson().toJson(listRequestInsertProductDto));
+				String msg = messageService.getByCode("msg.error.call.api.insert.product");
+				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
+				LOG.error(msg);
 			}
 		} catch (ClientProtocolException e) {
-			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
+			String msg = messageService.getByCode("msg.error.call.api.insert.product");
+			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(msg).build();
 			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
+			LOG.error(msg);
 		} catch (IOException e) {
-			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
+			String msg = messageService.getByCode("msg.error.call.api.insert.product");
+			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(msg).build();
 			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
+			LOG.error(msg);
 		}
 		
 		this.jobService.createOrUpdate(job);

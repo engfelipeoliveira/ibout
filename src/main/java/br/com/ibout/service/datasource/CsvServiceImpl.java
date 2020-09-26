@@ -64,12 +64,27 @@ public class CsvServiceImpl implements DataSourceService {
 	private Product map(Mapping mapping, String[] line) {
 		return Product.builder()
 				.idClient(mapping.getIdClient())
-				.code(line[mapping.getCode()] != null ? trimToNull(line[mapping.getCode()]) : null)
-				.brand(line[mapping.getBrand()] != null ? trimToNull(line[mapping.getBrand()]) : null)
-				.complement(line[mapping.getCode()] != null ? trimToNull(line[mapping.getComplement()]) : null)
-				.description(line[mapping.getDescription()] != null ? trimToNull(line[mapping.getDescription()]) : null)
-				.price(line[mapping.getPrice()] != null ? trimToNull(line[mapping.getPrice()]) : null)
+				.code(mapping.getCode() != null && line[mapping.getCode()] != null ? trimToNull(line[mapping.getCode()]) : null)
+				.description(mapping.getDescription() != null && line[mapping.getDescription()] != null ? trimToNull(line[mapping.getDescription()]) : null)
+				.brand(mapping.getBrand() != null && line[mapping.getBrand()] != null ? trimToNull(line[mapping.getBrand()]) : null)
+				.complement(mapping.getComplement() != null && line[mapping.getCode()] != null ? trimToNull(line[mapping.getComplement()]) : null)
+				.groupProduct(mapping.getGroupProduct() != null && line[mapping.getGroupProduct()] != null ? trimToNull(line[mapping.getGroupProduct()]) : null)
+				.price(mapping.getPrice() != null && line[mapping.getPrice()] != null ? trimToNull(line[mapping.getPrice()]) : null)
+				.priceSold(mapping.getPriceSold() != null && line[mapping.getPriceSold()] != null ? trimToNull(line[mapping.getPriceSold()]) : null)
+				.priceClub(mapping.getPriceClub() != null && line[mapping.getPriceClub()] != null ? trimToNull(line[mapping.getPriceClub()]) : null)
+				.sold(mapping.getSold() != null && line[mapping.getSold()] != null ? trimToNull(line[mapping.getSold()]) : null)
+				.stock(mapping.getStock() != null && line[mapping.getStock()] != null ? trimToNull(line[mapping.getStock()]) : null)
+				.internalCode(mapping.getInternalCode() != null && line[mapping.getInternalCode()] != null ? trimToNull(line[mapping.getInternalCode()]) : null)
+				.bowl(mapping.getBowl() != null && line[mapping.getBowl()] != null ? trimToNull(line[mapping.getBowl()]) : null)
+				.photo(mapping.getPhoto() != null && line[mapping.getPhoto()] != null ? trimToNull(line[mapping.getPhoto()]) : null)
+				.unit(mapping.getUnit() != null && line[mapping.getUnit()] != null ? trimToNull(line[mapping.getUnit()]) : null)
+				.visible(mapping.getVisible() != null && line[mapping.getVisible()] != null ? trimToNull(line[mapping.getVisible()]) : null)
 				.build();
+		
+		
+		
+		
+		
 	}
 
 

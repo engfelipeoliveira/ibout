@@ -26,34 +26,34 @@ public class Mapping implements Serializable {
 	
 	private Long idClient;
 
-	private int code;
+	private Integer code;
 
-	private int description;
+	private Integer description;
 	
-	private int brand;
+	private Integer brand;
 	
-	private int complement;
+	private Integer complement;
 	
-	private int groupProduct;
+	private Integer groupProduct;
 
-	private int price;
+	private Integer price;
 	
-	private int priceSold;
+	private Integer priceSold;
 	
-	private int priceClub;
+	private Integer priceClub;
 	
-	private int sold;
+	private Integer sold;
 
-	private int stock;
+	private Integer stock;
 	
-	private int internalCode;
+	private Integer internalCode;
 	
-	private int bowl;
+	private Integer bowl;
 	
-	private int photo;
+	private Integer photo;
 	
-	private int unit;
+	private Integer unit;
 	
-	private int visible;
+	private Integer visible;
 
 }
