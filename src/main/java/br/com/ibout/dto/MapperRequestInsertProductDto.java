@@ -39,7 +39,7 @@ public class MapperRequestInsertProductDto {
 				.preco(!isBlank(product.getPrice()) ? replace(product.getPrice(), ",", ".") : null)
 				.preco_oferta(!isBlank(product.getSold()) ? replace(product.getPriceSold(), ",", ".") : null)
 				.preco_clube(!isBlank(product.getPriceClub()) ? replace(product.getPriceClub(), ",", ".") : null)
-				.oferta(isBlank(product.getSold()) ? Long.parseLong(product.getSold()) : 0L)
+				.oferta(!isBlank(product.getSold()) ? Long.parseLong(product.getSold()) : 0L)
 				.estoque(trimToEmpty(product.getStock()))
 				.codigo_interno(trimToEmpty(product.getInternalCode()))
 				.vasilha(trimToEmpty(product.getBowl()))
