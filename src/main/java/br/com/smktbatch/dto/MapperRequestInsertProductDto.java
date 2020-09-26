@@ -19,9 +19,9 @@ public class MapperRequestInsertProductDto {
 	public static RequestInsertProductDto fromProductDto(Product product) {
 		return RequestInsertProductDto.builder()
 				.codigo(product.getCode())
-				.descricao(product.getDescription())
+				.descricao(product.getDescription() != null ? product.getDescription() : " ")
 				.marca(product.getBrand())
-				.complemento(product.getComplement())
+				.complemento(product.getComplement() != null ? product.getComplement() : " ")
 				.grupo(product.getGroupProduct())
 				.preco(product.getPrice() != null ? replace(product.getPrice(), ",", ".") : null)
 				.preco_oferta(product.getPriceSold() != null ? replace(product.getPriceSold(), ",", ".") : null)

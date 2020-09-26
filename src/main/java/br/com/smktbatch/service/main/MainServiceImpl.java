@@ -28,8 +28,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-
 import br.com.smktbatch.dto.RequestInsertProductDto;
 import br.com.smktbatch.enums.DataSource;
 import br.com.smktbatch.model.local.Product;
@@ -145,6 +143,8 @@ public class MainServiceImpl implements MainService {
 		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
 		List<Product> productsSaved = this.productService.getAll();
 		
+		LOG.info("total de produtos na base " + productsSaved.size());
+		
 		dataSourceFactory(parameter.getDataSource()).read(parameter, mapping).stream().forEach(product ->{
 			
 			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(product.getCode())).findFirst().isPresent()) {
@@ -163,8 +163,9 @@ public class MainServiceImpl implements MainService {
 			}
 		});
 		
-		callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
-		
+		if(!listRequestInsertProductDto.isEmpty()) {
+			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);	
+		}
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
@@ -174,9 +175,9 @@ public class MainServiceImpl implements MainService {
 			LOG.info(returnApi);
 			
 			if(StringUtils.length(returnApi) > 200) {
-				Gson gson = new Gson();
-				String json = gson.toJson(listRequestInsertProductDto);
-				ErrorJob error = ErrorJob.builder().job(job).json(json).stackTrace(returnApi).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
+				//Gson gson = new Gson();
+				//String json = gson.toJson(listRequestInsertProductDto);
+				ErrorJob error = ErrorJob.builder().job(job).description(messageService.getByCode("msg.error.call.api.insert.product")).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 			}
 		} catch (ClientProtocolException e) {
