@@ -138,6 +138,7 @@ public class MainServiceImpl implements MainService {
 				this.jobService.createOrUpdate(job);
 			}
 		}
+		LOG.info("Aguardando a proxima execucao");
 	}
 	
 	private void createProduct(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job) throws Exception {
@@ -171,12 +172,13 @@ public class MainServiceImpl implements MainService {
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
+		LOG.info("Executando API");
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
 			LOG.info("Retorno API " + returnApi);
 			
-			if(length(returnApi) > 200) {
+			if(length(returnApi) > 500) {
 				LOG.error(new Gson().toJson(listRequestInsertProductDto));
 				String msg = messageService.getByCode("msg.error.call.api.insert.product");
 				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();

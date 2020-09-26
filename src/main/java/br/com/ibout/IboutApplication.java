@@ -32,7 +32,7 @@ public class IboutApplication implements CommandLineRunner {
 		idClient =  parseLong(args[1]);
 	}
 	
-	@Scheduled(initialDelay = 10000, fixedDelay = 10000)
+	@Scheduled(initialDelay = 10000, fixedDelay = 3600000)
 	private void execute() throws Exception {
 		mainService.execute(tokenClient, idClient);
 	}
