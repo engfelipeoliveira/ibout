@@ -146,9 +146,11 @@ public class MainServiceImpl implements MainService {
 		List<RequestInsertProductDto> listRequestInsertProductDto = new ArrayList<RequestInsertProductDto>();
 		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
 		List<Product> productsSaved = this.productService.getAll();
-		LOG.info("total de produtos na base local " + productsSaved.size());
+		List<Product> productsToSave = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
+		LOG.info("total de produtos no banco de dados local " + productsSaved.size());
+		LOG.info("total de produtos no arquivo " + productsToSave.size());
 		
-		dataSourceFactory(parameter.getDataSource()).read(parameter, mapping).stream().forEach(product ->{
+		productsToSave.stream().forEach(product ->{
 			
 			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(product.getCode())).findFirst().isPresent()) {
 				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
@@ -160,24 +162,22 @@ public class MainServiceImpl implements MainService {
 				}
 			}
 			
-			if(!listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
+			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
 				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
 				listRequestInsertProductDto.clear();
 			}
 		});
 		
-		if(!listRequestInsertProductDto.isEmpty()) {
+		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
 			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);	
 			listRequestInsertProductDto.clear();
 		}
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
-		LOG.info("Executando API");
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
-			LOG.info("Retorno API : " + returnApi);
 			
 			if(length(returnApi) > 500) {
 				LOG.error(new Gson().toJson(listRequestInsertProductDto));
