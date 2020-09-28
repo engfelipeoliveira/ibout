@@ -7,6 +7,7 @@ import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import br.com.ibout.model.local.Product;
+import br.com.ibout.model.remote.Parameter;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class MapperRequestInsertProductDto {
 		}
 	}
 	
-	public static RequestInsertProductDto fromProductDto(Product product) {
+	public static RequestInsertProductDto fromProductDto(Product product, Parameter parameter) {
 		return RequestInsertProductDto.builder()
 				.codigo(trimToEmpty(product.getCode()))
 				.descricao(trimToEmpty(product.getDescription()))
@@ -39,8 +40,8 @@ public class MapperRequestInsertProductDto {
 				.preco(!isBlank(product.getPrice()) ? replace(product.getPrice(), ",", ".") : null)
 				.preco_oferta(!isBlank(product.getSold()) ? replace(product.getPriceSold(), ",", ".") : null)
 				.preco_clube(!isBlank(product.getPriceClub()) ? replace(product.getPriceClub(), ",", ".") : null)
-				.oferta(!isBlank(product.getSold()) ? Long.parseLong(product.getSold()) : 0L)
-				.estoque(trimToEmpty(product.getStock()))
+				.oferta(!isBlank(product.getSold()) ? 1L : 0L)
+				.estoque(!isBlank(product.getStock()) && !"0".equals(product.getStock()) ? product.getStock() : parameter.getMinStock())
 				.codigo_interno(trimToEmpty(product.getInternalCode()))
 				.vasilha(trimToEmpty(product.getBowl()))
 				.id_estabelecimento(product.getIdClient())

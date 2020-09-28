@@ -39,6 +39,8 @@ public class Job implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	private Long idClient;
+	
 	private LocalDateTime startTime;
 	
 	private LocalDateTime endTime;

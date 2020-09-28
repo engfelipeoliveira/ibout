@@ -21,7 +21,6 @@ import org.junit.Test;
 import br.com.ibout.model.remote.Parameter;
 import br.com.ibout.repository.remote.ParameterRepository;
 import br.com.ibout.service.message.MessageService;
-import br.com.ibout.service.parameter.ParameterServiceImpl;
 
 public class ParameterServiceImplTest {
 
@@ -68,24 +67,54 @@ public class ParameterServiceImplTest {
 	}
 	
 	@Test
-	public void whenValidate_givenParameterJobHourGreaterThan23_thenReturnListError() throws Exception {
-		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
-		Parameter parameter = Parameter.builder().hourJob("25").build();
+	public void whenValidate_givenParameterJobHourGreaterThan2359_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		Parameter parameter = Parameter.builder().hourJob("24:00").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
-		verify(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
+		verify(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
 		assertThat(listErrors).contains("msg");
 	}
 	
 	@Test
-	public void whenValidate_givenParameterJobHourSmallerThan0_thenReturnListError() throws Exception {
-		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
-		Parameter parameter = Parameter.builder().hourJob("-2").build();
+	public void whenValidate_givenParameterJobHourInvalidFormatMinute_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		Parameter parameter = Parameter.builder().hourJob("4:1").build();
 		List<String> listErrors = underTest.validate(parameter);
 		
-		verify(mockMessageService).getByCode("msg.error.validation.hourjob.not.between.0.and.23");
+		verify(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
+	public void whenValidate_givenParameterJobHourInvalidFormatHour_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		Parameter parameter = Parameter.builder().hourJob("4:10").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
 		assertThat(listErrors).contains("msg");
 	}
+	
+	@Test
+	public void whenValidate_givenParameterJobHourMinuteGreaterThan59_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		Parameter parameter = Parameter.builder().hourJob("4:60").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		assertThat(listErrors).contains("msg");
+	}	
+	
+	@Test
+	public void whenValidate_givenParameterJobHourInvalidFormat_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		Parameter parameter = Parameter.builder().hourJob("xx8").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.hourjob.invalid");
+		assertThat(listErrors).contains("msg");
+	}	
 	
 	@Test
 	public void whenValidate_givenParameterDataSourceNull_thenReturnListError() throws Exception {
@@ -337,16 +366,6 @@ public class ParameterServiceImplTest {
 	}
 	
 	@Test
-	public void whenValidate_givenParameterApiSizeArrayInsertProductNull_thenReturnListError() throws Exception {
-		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
-		Parameter parameter = Parameter.builder().apiSizeArrayInsertProduct(null).build();
-		List<String> listErrors = underTest.validate(parameter);
-		
-		verify(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
-		assertThat(listErrors).contains("msg");
-	}	
-	
-	@Test
 	public void whenValidate_givenParameterApiUrlInsertProductSizeNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.url.insert.products.null");
 		Parameter parameter = Parameter.builder().apiUrlInsertProduct(null).build();
@@ -355,6 +374,16 @@ public class ParameterServiceImplTest {
 		verify(mockMessageService).getByCode("msg.error.validation.api.url.insert.products.null");
 		assertThat(listErrors).contains("msg");
 	}	
+
+	@Test
+	public void whenValidate_givenParameterApiSizeArrayInsertProductNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		Parameter parameter = Parameter.builder().apiSizeArrayInsertProduct(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+		assertThat(listErrors).contains("msg");
+	}
 	
 	@Test
 	public void whenValidate_givenParameterApiUrlInsertProductSizeNotNumeric_thenReturnListError() throws Exception {
@@ -367,6 +396,26 @@ public class ParameterServiceImplTest {
 	}	
 	
 	@Test
+	public void whenValidate_givenParameterMinStockNull_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.min.stock.invalid");
+		Parameter parameter = Parameter.builder().minStock(null).build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.min.stock.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
+	public void whenValidate_givenParameterMinStockNotNumeric_thenReturnListError() throws Exception {
+		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.min.stock.invalid");
+		Parameter parameter = Parameter.builder().minStock("X").build();
+		List<String> listErrors = underTest.validate(parameter);
+		
+		verify(mockMessageService).getByCode("msg.error.validation.min.stock.invalid");
+		assertThat(listErrors).contains("msg");
+	}
+	
+	@Test
 	public void whenValidate_givenParameterFileValid_thenReturnListEmpty() throws Exception {
 		Path source = get("dir_source_test_unit");
 		Path subDir = get("dir_source_test_unit/1");
@@ -376,13 +425,14 @@ public class ParameterServiceImplTest {
 		createDirectories(target);
 		Parameter parameter = Parameter.builder()
 				.active(true)
-				.hourJob("15,20")
+				.hourJob("15:20,20:11")
 				.dataSource(TXT)
 				.fileDelimiter(";")
 				.dirSource("dir_source_test_unit")
 				.dirTarget("dir_target_test_unit")
 				.apiUrlInsertProduct("apiUrlInsertProduct")
 				.apiSizeArrayInsertProduct("100")
+				.minStock("1")
 				.build();
 		List<String> listErrors = underTest.validate(parameter);
 		delete(subDir);
@@ -396,7 +446,7 @@ public class ParameterServiceImplTest {
 	public void whenValidate_givenParameterDbValid_thenReturnListEmpty() throws Exception {
 		Parameter parameter = Parameter.builder()
 				.active(true)
-				.hourJob("15,20")
+				.hourJob("15:01,20:15")
 				.dataSource(DB)
 				.bdDriver("driver")
 				.bdPass("pass")
@@ -404,6 +454,7 @@ public class ParameterServiceImplTest {
 				.bdSql("sql")
 				.bdUrl("url")
 				.sgbd("sgbd")
+				.minStock("1")
 				.apiUrlInsertProduct("apiUrlInsertProduct")
 				.apiSizeArrayInsertProduct("1")
 				.build();

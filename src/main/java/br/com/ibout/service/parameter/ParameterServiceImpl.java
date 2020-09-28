@@ -14,6 +14,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -60,15 +62,13 @@ public class ParameterServiceImpl implements ParameterService {
 
 			if (parameter.getHourJob() != null) {
 				asList(split(parameter.getHourJob(), ",")).stream().forEach(h -> {
-					try {
-						Long hLong = parseLong(h);
-						if(hLong < 0L || hLong > 23L) {
-							String msg = this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23");
-							LOG.error(msg);
-							listErrors.add(msg);
-						}						
-					} catch (Exception e) {
-						String msg = this.messageService.getByCode("msg.error.validation.hourjob.not.between.0.and.23");
+					//String regex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+					String regex = "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$";
+					Pattern p = Pattern.compile(regex); 
+					Matcher m = p.matcher(h); 
+					
+					if(!m.matches()) {
+						String msg = this.messageService.getByCode("msg.error.validation.hourjob.invalid");
 						LOG.error(msg);
 						listErrors.add(msg);
 					}
@@ -161,6 +161,21 @@ public class ParameterServiceImpl implements ParameterService {
 					parseLong(parameter.getApiSizeArrayInsertProduct());	
 				} catch (Exception e) {
 					String msg = this.messageService.getByCode("msg.error.validation.api.size.array.insert.products.invalid");
+					LOG.error(msg);
+					listErrors.add(msg);
+				}
+				
+			}
+			
+			if (isBlank(parameter.getMinStock())) {
+				String msg = this.messageService.getByCode("msg.error.validation.min.stock.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
+			}else {
+				try {
+					parseLong(parameter.getMinStock());	
+				} catch (Exception e) {
+					String msg = this.messageService.getByCode("msg.error.validation.min.stock.invalid");
 					LOG.error(msg);
 					listErrors.add(msg);
 				}

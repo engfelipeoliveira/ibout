@@ -41,6 +41,13 @@ public class Parameter implements Serializable {
 	private String hourJob;
 
 	private boolean importAll;
+	
+	private String minStock;
+	
+	// API
+	private String apiUrlInsertProduct;
+	
+	private String apiSizeArrayInsertProduct;
 
 	// csv and txt
 	private String fileDelimiter;
@@ -69,9 +76,5 @@ public class Parameter implements Serializable {
 	
 	private String bdSql;
 	
-	// API
-	private String apiUrlInsertProduct;
-	
-	private String apiSizeArrayInsertProduct;
 
 }

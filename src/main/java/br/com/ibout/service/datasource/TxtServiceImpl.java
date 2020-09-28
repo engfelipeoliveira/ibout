@@ -3,8 +3,10 @@ package br.com.ibout.service.datasource;
 import static br.com.ibout.enums.DataSource.TXT;
 import static br.com.ibout.service.datasource.FileUtils.filterFile;
 import static br.com.ibout.service.datasource.FileUtils.moveFile;
+import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +18,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import br.com.ibout.model.local.Product;
@@ -24,6 +27,8 @@ import br.com.ibout.model.remote.Parameter;
 
 @Service
 public class TxtServiceImpl implements DataSourceService {
+	
+	private static final Logger LOG = getLogger(TxtServiceImpl.class);
 	
 	@Override
 	public List<Product> read(Parameter parameter, Mapping mapping) {
@@ -43,10 +48,10 @@ public class TxtServiceImpl implements DataSourceService {
 		return listProduct;
 	}
 
-	private List<Product> readProducts(InputStream inputStream, Parameter parameter, Mapping mapping) throws IOException {
+	private List<Product> readProducts(InputStream inputStream, Parameter parameter, Mapping mapping)  {
 		List<Product> listProduct = new ArrayList<Product>();
+		String line = null;
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-			String line;
 			if(parameter.isHeader()) {
 				br.readLine();
 			}
@@ -56,6 +61,8 @@ public class TxtServiceImpl implements DataSourceService {
 			}
 			br.close();
 			inputStream.close();
+		} catch (Exception e) {
+			LOG.error(format("Falha ao ler linha do arquivo. Processo continua : %s %s", line, e));
 		}
 		return listProduct;
 	}
@@ -78,7 +85,6 @@ public class TxtServiceImpl implements DataSourceService {
 				.bowl(mapping.getBowl() != null && columns[mapping.getBowl()] != null ? trimToNull(columns[mapping.getBowl()]) : null)
 				.photo(mapping.getPhoto() != null && columns[mapping.getPhoto()] != null ? trimToNull(columns[mapping.getPhoto()]) : null)
 				.unit(mapping.getUnit() != null && columns[mapping.getUnit()] != null ? trimToNull(columns[mapping.getUnit()]) : null)
-				.visible(mapping.getVisible() != null && columns[mapping.getVisible()] != null ? trimToNull(columns[mapping.getVisible()]) : null)
 				.build();
 		
 	}

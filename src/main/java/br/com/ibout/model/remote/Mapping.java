@@ -54,6 +54,4 @@ public class Mapping implements Serializable {
 	
 	private Integer unit;
 	
-	private Integer visible;
-
 }

@@ -77,23 +77,21 @@ public class MainServiceImpl implements MainService {
 
 	@Override
 	public void execute(String tokenClient, Long idClient) throws Exception {
-		LOG.info(format("execute(%s,%s)", tokenClient, idClient));
-		
-		Job job = Job.builder().startTime(now()).status(INICIADO).build();
+		Job job = Job.builder().startTime(now()).status(INICIADO).idClient(idClient).build();
 		Parameter parameter = this.parameterService.getByIdClient(idClient);
 		if (parameter == null) {
-			this.jobService.createOrUpdate(job);
+			job = this.jobService.createOrUpdate(job);
 			String msg = messageService.getByCode("msg.error.validation.parameters.not.found");
 			ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 			job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
 			LOG.error(msg);
 			LOG.error("Processo finalizado com erro");
-			this.jobService.createOrUpdate(job);
+			job = this.jobService.createOrUpdate(job);
 		} else {
 			LOG.info(parameter.toString());
 			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
-				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH")))){
+				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH:mm")))){
 					job = this.jobService.createOrUpdate(job);
 					Mapping mapping = mappingService.getByIdClient(idClient);
 					if (mapping == null) {
@@ -111,23 +109,21 @@ public class MainServiceImpl implements MainService {
 							}
 							
 							createProduct(parameter, mapping, tokenClient, idClient, job);
-							job = job.toBuilder().status(job.getStatus() != null ? job.getStatus() : SUCESSO).endTime(now()).build();
-							this.jobService.createOrUpdate(job);
+							job = job.toBuilder().status(SUCESSO).endTime(now()).build();
+							job = this.jobService.createOrUpdate(job);
+							LOG.info("Processo finalizado com sucesso. Aguardando proxima execucao.");
 							
 						} catch (Exception e) {
 							String msg = messageService.getByCode("msg.error.read.file");
-							ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(msg).build();
+							ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.toString()).description(msg).build();
 							job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
 							LOG.error("Processo finalizado com erro");
-							this.jobService.createOrUpdate(job);
+							job = this.jobService.createOrUpdate(job);
 						}
 					}
-				}else {
-					LOG.info("Status inativo ou nao e a hora de executar");
-					LOG.info("Processo finalizado sem execucao");
 				}
 			} else {
-				this.jobService.createOrUpdate(job);
+				job = this.jobService.createOrUpdate(job);
 				Set<ErrorJob> errors = new HashSet<ErrorJob>();
 				for (String e : listError) {
 					errors.add(ErrorJob.builder().job(job).description(e).build());
@@ -135,10 +131,9 @@ public class MainServiceImpl implements MainService {
 
 				job = job.toBuilder().endTime(now()).status(ERRO).errors(errors).build();
 				LOG.error("Processo finalizado com erro");
-				this.jobService.createOrUpdate(job);
+				job = this.jobService.createOrUpdate(job);
 			}
 		}
-		LOG.info("Aguardando a proxima execucao");
 	}
 	
 	private void createProduct(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job) throws Exception {
@@ -155,10 +150,10 @@ public class MainServiceImpl implements MainService {
 			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(product.getCode())).findFirst().isPresent()) {
 				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
 				if(productSaved == null) {
-					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
+					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product), parameter));
 				}else if(!productSaved.equals(product)){
 					product.setId(productSaved.getId());
-					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product)));
+					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product), parameter));
 				}
 			}
 			
@@ -175,7 +170,6 @@ public class MainServiceImpl implements MainService {
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
-		LOG.info("Chamando API");
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);

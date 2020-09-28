@@ -95,7 +95,6 @@ public class XlsServiceImpl implements DataSourceService {
 		if(mapping.getInternalCode() != null) { row.getCell(mapping.getInternalCode()).setCellType(STRING); }
 		if(mapping.getBowl() != null) { row.getCell(mapping.getBowl()).setCellType(STRING); }
 		if(mapping.getUnit() != null) { row.getCell(mapping.getUnit()).setCellType(STRING); }
-		if(mapping.getVisible() != null) { row.getCell(mapping.getVisible()).setCellType(STRING); }
 		
 		return Product.builder()
 				.idClient(mapping.getIdClient())
@@ -113,7 +112,6 @@ public class XlsServiceImpl implements DataSourceService {
 				.bowl(mapping.getBowl() != null && row.getCell(mapping.getBowl()) != null ? trimToNull(row.getCell(mapping.getBowl()).getStringCellValue()) : null)
 				.photo(mapping.getPhoto() != null && row.getCell(mapping.getPhoto()) != null ? trimToNull(row.getCell(mapping.getPhoto()).getStringCellValue()) : null)
 				.unit(mapping.getUnit() != null && row.getCell(mapping.getUnit()) != null ? trimToNull(row.getCell(mapping.getUnit()).getStringCellValue()) : null)
-				.visible(mapping.getVisible() != null && row.getCell(mapping.getVisible()) != null ? trimToNull(row.getCell(mapping.getVisible()).getStringCellValue()) : null)
 				.build();
 	}
 

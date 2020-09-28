@@ -78,12 +78,7 @@ public class CsvServiceImpl implements DataSourceService {
 				.bowl(mapping.getBowl() != null && line[mapping.getBowl()] != null ? trimToNull(line[mapping.getBowl()]) : null)
 				.photo(mapping.getPhoto() != null && line[mapping.getPhoto()] != null ? trimToNull(line[mapping.getPhoto()]) : null)
 				.unit(mapping.getUnit() != null && line[mapping.getUnit()] != null ? trimToNull(line[mapping.getUnit()]) : null)
-				.visible(mapping.getVisible() != null && line[mapping.getVisible()] != null ? trimToNull(line[mapping.getVisible()]) : null)
 				.build();
-		
-		
-		
-		
 		
 	}
 

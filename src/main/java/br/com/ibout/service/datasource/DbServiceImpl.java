@@ -64,7 +64,6 @@ public class DbServiceImpl implements DataSourceService {
 				.bowl(mapping.getBowl() != null && rs.getString(mapping.getBowl() + 1) != null ? trimToNull(rs.getString(mapping.getBowl() + 1)) : null)
 				.photo(mapping.getPhoto() != null && rs.getString(mapping.getPhoto() + 1) != null ? trimToNull(rs.getString(mapping.getPhoto() + 1)) : null)
 				.unit(mapping.getUnit() != null && rs.getString(mapping.getUnit() + 1) != null ? trimToNull(rs.getString(mapping.getUnit() + 1)) : null)
-				.visible(mapping.getVisible() != null && rs.getString(mapping.getVisible() + 1) != null ? trimToNull(rs.getString(mapping.getVisible() + 1)) : null)
 				.build();
 	}
 	
