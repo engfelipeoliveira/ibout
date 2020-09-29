@@ -1,7 +1,7 @@
 package br.com.ibout.dto;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
@@ -21,12 +21,15 @@ import lombok.ToString;
 @Builder(toBuilder = true)
 public class MapperRequestInsertProductDto {
 	
-	private static String getUnitFromProductDesc(Product product) {
-		if((!isBlank(product.getComplement()) && containsIgnoreCase(product.getComplement(), "KG")) ||
-				(!isBlank(product.getDescription()) && containsIgnoreCase(product.getDescription(), "KG"))) {
+	private static String getUnitFromParameter(Product product, Parameter parameter) {
+		if(isBlank(parameter.getTermMappingKg()) && !isBlank(product.getUnit())) {
+			return product.getUnit();
+		}else if(isBlank(parameter.getTermMappingKg()) && isBlank(product.getUnit())) {
+			return "UN";
+		}else if(!isBlank(parameter.getTermMappingKg()) && !isBlank(product.getUnit()) && contains(product.getUnit().toUpperCase(), parameter.getTermMappingKg().toUpperCase())){
 			return "KG";
-		}else {
-			return "UN";			
+		} else {
+			return "UN";
 		}
 	}
 	
@@ -46,7 +49,7 @@ public class MapperRequestInsertProductDto {
 				.vasilha(trimToEmpty(product.getBowl()))
 				.id_estabelecimento(product.getIdClient())
 				.foto(isBlank(product.getPhoto()) ? format("%s%s%s", "img/", product.getCode(), ".png") : product.getPhoto())
-				.unidade(isBlank(product.getUnit()) ? getUnitFromProductDesc(product) : product.getUnit())
+				.unidade(getUnitFromParameter(product, parameter))
 				.visivel(1L)
 				.build();
 	}

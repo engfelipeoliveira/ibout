@@ -44,6 +44,8 @@ public class Parameter implements Serializable {
 	
 	private String minStock;
 	
+	private String termMappingKg;
+	
 	// API
 	private String apiUrlInsertProduct;
 	
