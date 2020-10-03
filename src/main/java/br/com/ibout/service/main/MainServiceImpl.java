@@ -10,7 +10,6 @@ import static br.com.ibout.enums.StatusJob.INICIADO;
 import static br.com.ibout.enums.StatusJob.SUCESSO;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.asList;

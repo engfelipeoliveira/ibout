@@ -46,7 +46,7 @@ public class MapperRequestInsertProductDto {
 				.oferta(!isBlank(product.getSold()) ? 1L : 0L)
 				.estoque(!isBlank(product.getStock()) && !"0".equals(product.getStock()) ? product.getStock() : parameter.getMinStock())
 				.codigo_interno(trimToEmpty(product.getInternalCode()))
-				.vasilha(trimToEmpty(product.getBowl()))
+				.vasilha(!isBlank(product.getBowl()) ? "S" : "N")
 				.id_estabelecimento(product.getIdClient())
 				.foto(isBlank(product.getPhoto()) ? format("%s%s%s", "img/", product.getCode(), ".png") : product.getPhoto())
 				.unidade(getUnitFromParameter(product, parameter))
