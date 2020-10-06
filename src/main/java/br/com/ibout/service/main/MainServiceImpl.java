@@ -169,6 +169,7 @@ public class MainServiceImpl implements MainService {
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
+		LOG.info("Executando API");
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);

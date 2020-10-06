@@ -62,7 +62,6 @@ public class ParameterServiceImpl implements ParameterService {
 
 			if (parameter.getHourJob() != null) {
 				asList(split(parameter.getHourJob(), ",")).stream().forEach(h -> {
-					//String regex = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
 					String regex = "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$";
 					Pattern p = Pattern.compile(regex); 
 					Matcher m = p.matcher(h); 

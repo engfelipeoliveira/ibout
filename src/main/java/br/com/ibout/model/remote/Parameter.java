@@ -78,5 +78,7 @@ public class Parameter implements Serializable {
 	
 	private String bdSql;
 	
+	private String bdSqlConnDbLink;
+	
 
 }

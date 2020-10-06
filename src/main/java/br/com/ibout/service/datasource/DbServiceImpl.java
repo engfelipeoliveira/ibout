@@ -2,6 +2,7 @@ package br.com.ibout.service.datasource;
 
 import static java.lang.Class.forName;
 import static java.sql.DriverManager.getConnection;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 import java.sql.Connection;
@@ -25,19 +26,22 @@ public class DbServiceImpl implements DataSourceService {
 		List<Product> listProduct = new ArrayList<Product>();
 		Connection conn = null;
 		Statement stmt = null;
-		
+		ResultSet rs = null;
+				
 		try {
 			forName(parameter.getBdDriver());
 			conn = getConnection(parameter.getBdUrl(), parameter.getBdUser(), parameter.getBdPass());
 			stmt = conn.createStatement();
-		      ResultSet rs = stmt.executeQuery(parameter.getBdSql());
-		      
-		      while(rs.next()){
-		    	  listProduct.add(map(mapping, rs));
-		       }
-		      rs.close();
-		      stmt.close();
-		      conn.close();
+			if(!isBlank(parameter.getBdSqlConnDbLink())) {
+				rs = stmt.executeQuery(parameter.getBdSqlConnDbLink());
+			}
+			rs = stmt.executeQuery(parameter.getBdSql());
+			while(rs.next()){
+				listProduct.add(map(mapping, rs));
+			}
+			rs.close();
+			stmt.close();
+			conn.close();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
