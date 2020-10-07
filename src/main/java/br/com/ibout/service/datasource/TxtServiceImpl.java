@@ -57,7 +57,11 @@ public class TxtServiceImpl implements DataSourceService {
 			}
 			
 			while ((line = br.readLine()) != null) {
-				listProduct.add(this.map(mapping, line, parameter.getFileDelimiter()));
+				try {
+					listProduct.add(this.map(mapping, line, parameter.getFileDelimiter()));	
+				} catch (Exception e) {
+					LOG.error(format("Falha ao ler linha do arquivo. Processo continua : %s %s", line, e));
+				}
 			}
 			br.close();
 			inputStream.close();

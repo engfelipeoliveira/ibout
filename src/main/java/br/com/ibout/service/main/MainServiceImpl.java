@@ -173,10 +173,10 @@ public class MainServiceImpl implements MainService {
 		String returnApi = null;
 		try {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
+			LOG.info(new Gson().toJson(listRequestInsertProductDto));
+			LOG.error(returnApi);
 			
 			if(length(returnApi) > 500) {
-				LOG.error(new Gson().toJson(listRequestInsertProductDto));
-				LOG.error(returnApi);
 				String msg = messageService.getByCode("msg.error.call.api.insert.product");
 				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
