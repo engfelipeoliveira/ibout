@@ -6,6 +6,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
+import java.math.BigDecimal;
+
 import br.com.ibout.model.local.Product;
 import br.com.ibout.model.remote.Parameter;
 import lombok.Builder;
@@ -44,7 +46,7 @@ public class MapperRequestInsertProductDto {
 				.preco_oferta(!isBlank(product.getSold()) ? replace(product.getPriceSold(), ",", ".") : null)
 				.preco_clube(!isBlank(product.getPriceClub()) ? replace(product.getPriceClub(), ",", ".") : null)
 				.oferta("S".equalsIgnoreCase(product.getSold()) ? 1L : 0L)
-				.estoque(!isBlank(product.getStock()) && !"0".equals(product.getStock()) ? product.getStock() : parameter.getMinStock())
+				.estoque(!isBlank(product.getStock()) && new BigDecimal(replace(product.getStock(), ",", ".")).compareTo(new BigDecimal("0")) > 0 ? product.getStock() : parameter.getMinStock())
 				.codigo_interno(trimToEmpty(product.getInternalCode()))
 				.vasilha(!isBlank(product.getBowl()) ? "S" : "N")
 				.id_estabelecimento(product.getIdClient())
