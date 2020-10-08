@@ -87,7 +87,6 @@ public class MainServiceImpl implements MainService {
 			LOG.error("Processo finalizado com erro");
 			job = this.jobService.createOrUpdate(job);
 		} else {
-			LOG.info(parameter.toString());
 			List<String> listError = this.parameterService.validate(parameter);
 			if (listError.isEmpty()) {
 				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH:mm")))){
@@ -100,6 +99,7 @@ public class MainServiceImpl implements MainService {
 						LOG.error(msg);
 						LOG.error("Processo finalizado com erro");
 					} else {
+						LOG.info(parameter.toString());
 						LOG.info(mapping.toString());
 						try {
 							if(parameter.isImportAll()) {
@@ -110,7 +110,7 @@ public class MainServiceImpl implements MainService {
 							createProduct(parameter, mapping, tokenClient, idClient, job);
 							job = job.toBuilder().status(SUCESSO).endTime(now()).build();
 							job = this.jobService.createOrUpdate(job);
-							LOG.info("Processo finalizado com sucesso. Aguardando proxima execucao.");
+							LOG.info("Processo finalizado com sucesso. Aguardando proxima execucao: " + parameter.getHourJob());
 							
 						} catch (Exception e) {
 							String msg = messageService.getByCode("msg.error.read.file");
@@ -138,49 +138,64 @@ public class MainServiceImpl implements MainService {
 	private void createProduct(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job) throws Exception {
 		LOG.info("Comparando e criando produtos");
 		List<RequestInsertProductDto> listRequestInsertProductDto = new ArrayList<RequestInsertProductDto>();
+		List<Long> insert = new ArrayList<Long>();
+		List<Long> update = new ArrayList<Long>();
+		List<Product> listInsertProductDbLocal = new ArrayList<Product>();
 		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
 		List<Product> productsSaved = this.productService.getAll();
 		List<Product> productsToSave = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
 		LOG.info("total de produtos no banco de dados local " + productsSaved.size());
 		LOG.info("total de produtos no arquivo " + productsToSave.size());
 		
-		productsToSave.stream().forEach(product ->{
+		productsToSave.stream().forEach(productToSave ->{
 			
-			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(product.getCode())).findFirst().isPresent()) {
-				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(product.getCode())).findFirst().orElse(null);
+			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(productToSave.getCode())).findFirst().isPresent()) {
+				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(productToSave.getCode())).findFirst().orElse(null);
 				if(productSaved == null) {
-					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product), parameter));
-				}else if(!productSaved.equals(product)){
-					product.setId(productSaved.getId());
-					listRequestInsertProductDto.add(fromProductDto(productService.createOrUpdate(product), parameter));
-				}
+					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
+					listInsertProductDbLocal.add(productToSave);
+					insert.add(1L);
+				}else if(!productSaved.equals(productToSave)){
+					productToSave.setId(productSaved.getId());
+					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
+					listInsertProductDbLocal.add(productToSave);
+					update.add(1L);
+				}	
 			}
 			
 			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
-				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);
+				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal);
 				listRequestInsertProductDto.clear();
+				listInsertProductDbLocal.clear();
 			}
 		});
 		
 		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
-			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto);	
+			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal);	
 			listRequestInsertProductDto.clear();
+			listInsertProductDbLocal.clear();
 		}
+		
+		LOG.info("Total de produtos novos " + insert.size());			
+		LOG.info("Total de produtos atualizados " + update.size());
 	}
 	
-	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto) {
+	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto, List<Product> listInsertProductDbLocal) {
 		LOG.info("Executando API");
 		String returnApi = null;
 		try {
+			LOG.info("Pedido API " + new Gson().toJson(listRequestInsertProductDto));
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
-			LOG.info(new Gson().toJson(listRequestInsertProductDto));
-			LOG.error(returnApi);
+			LOG.info("Retorno API " + returnApi);
 			
 			if(length(returnApi) > 500) {
 				String msg = messageService.getByCode("msg.error.call.api.insert.product");
 				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 				LOG.error(msg);
+			}else {
+				LOG.info("Atualizando produtos no BD local");
+				productService.createOrUpdateAll(listInsertProductDbLocal);
 			}
 		} catch (ClientProtocolException e) {
 			String msg = messageService.getByCode("msg.error.call.api.insert.product");

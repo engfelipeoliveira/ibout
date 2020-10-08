@@ -20,6 +20,11 @@ public class ProductServiceImpl implements ProductService {
 	public Product createOrUpdate(Product product) {
 		return productRepository.save(product);
 	}
+	
+	@Override 
+	public void createOrUpdateAll(List<Product> products) {
+		productRepository.saveAll(products);
+	}
 
 	@Override
 	public List<Product> getAll() {
