@@ -48,12 +48,6 @@ public class ParameterServiceImpl implements ParameterService {
 
 		if (parameter != null) {
 
-			if (!parameter.isActive()) {
-				String msg = this.messageService.getByCode("msg.error.validation.status.job.inactive");
-				LOG.error(msg);
-				listErrors.add(msg);
-			}
-
 			if (parameter.getHourJob() == null) {
 				String msg = this.messageService.getByCode("msg.error.validation.hourjob.null");
 				LOG.error(msg);

@@ -47,16 +47,6 @@ public class ParameterServiceImplTest {
 	}
 	
 	@Test
-	public void whenValidate_givenParameterActiveFalse_thenReturnListError() throws Exception {
-		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.status.job.inactive");
-		Parameter parameter = Parameter.builder().active(false).build();
-		List<String> listErrors = underTest.validate(parameter);
-		
-		verify(mockMessageService).getByCode("msg.error.validation.status.job.inactive");
-		assertThat(listErrors).contains("msg");
-	}
-	
-	@Test
 	public void whenValidate_givenParameterJobHourNull_thenReturnListError() throws Exception {
 		willReturn("msg").given(mockMessageService).getByCode("msg.error.validation.hourjob.null");
 		Parameter parameter = Parameter.builder().hourJob(null).build();
