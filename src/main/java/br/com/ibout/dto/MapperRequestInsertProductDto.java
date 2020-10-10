@@ -6,12 +6,11 @@ import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
 import static org.apache.commons.lang3.StringUtils.replaceEach;
+import static org.apache.commons.lang3.StringUtils.stripAccents;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
-
-import org.apache.commons.lang3.StringUtils;
 
 import br.com.ibout.model.local.Product;
 import br.com.ibout.model.remote.Parameter;
@@ -41,16 +40,17 @@ public class MapperRequestInsertProductDto {
 	}
 	
 	private static String normalizeText(String term) {
-		String[] searchList = {"ª","º","?","*","'"};
-		String[] replacementList = {"a","o","","",""};
+		String[] searchList = {"?","*","'"};
+		String[] replacementList = {"","",""};
 		
 		term = trimToEmpty(term);
+		term = stripAccents(term);
 		term = replaceEach(term, searchList, replacementList);
+		term = term.replaceAll("[^\\p{Print}]", "");
 		term = normalize(term, Normalizer.Form.NFD);
 		term = isBlank(term) ? " " : term;
 		
 		return term;
-		
 	}
 	
 	public static RequestInsertProductDto fromProductDto(Product product, Parameter parameter) {
