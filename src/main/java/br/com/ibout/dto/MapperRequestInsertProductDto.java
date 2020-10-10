@@ -1,12 +1,17 @@
 package br.com.ibout.dto;
 
 import static java.lang.String.format;
+import static java.text.Normalizer.normalize;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
+import static org.apache.commons.lang3.StringUtils.replaceEach;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
+
+import org.apache.commons.lang3.StringUtils;
 
 import br.com.ibout.model.local.Product;
 import br.com.ibout.model.remote.Parameter;
@@ -35,13 +40,26 @@ public class MapperRequestInsertProductDto {
 		}
 	}
 	
+	private static String normalizeText(String term) {
+		String[] searchList = {"ª","º","?","*","'"};
+		String[] replacementList = {"a","o","","",""};
+		
+		term = trimToEmpty(term);
+		term = replaceEach(term, searchList, replacementList);
+		term = normalize(term, Normalizer.Form.NFD);
+		term = isBlank(term) ? " " : term;
+		
+		return term;
+		
+	}
+	
 	public static RequestInsertProductDto fromProductDto(Product product, Parameter parameter) {
 		return RequestInsertProductDto.builder()
-				.codigo(trimToEmpty(product.getCode()))
-				.descricao(trimToEmpty(product.getDescription()))
-				.marca(trimToEmpty(product.getBrand()))
-				.complemento(trimToEmpty(product.getComplement()))
-				.grupo(trimToEmpty(product.getGroupProduct()))
+				.codigo(normalizeText(product.getCode()))
+				.descricao(normalizeText(product.getDescription()))
+				.marca(normalizeText(product.getBrand()))
+				.complemento(normalizeText(product.getComplement()))
+				.grupo(normalizeText(product.getGroupProduct()))
 				.preco(!isBlank(product.getPrice()) ? replace(product.getPrice(), ",", ".") : null)
 				.preco_oferta(!isBlank(product.getSold()) ? replace(product.getPriceSold(), ",", ".") : null)
 				.preco_clube(!isBlank(product.getPriceClub()) ? replace(product.getPriceClub(), ",", ".") : null)

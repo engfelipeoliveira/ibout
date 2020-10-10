@@ -13,6 +13,7 @@ import static java.lang.Integer.parseInt;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.length;
 import static org.apache.commons.lang3.StringUtils.split;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -188,7 +189,7 @@ public class MainServiceImpl implements MainService {
 			returnApi = this.apiClientService.callInsertProduct(tokenClient, idClient, listRequestInsertProductDto, parameter);
 			LOG.info("Retorno API " + returnApi);
 			
-			if(length(returnApi) > 500) {
+			if(isBlank(returnApi) || length(returnApi) > 500) {
 				String msg = messageService.getByCode("msg.error.call.api.insert.product");
 				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
