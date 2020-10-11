@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
@@ -39,4 +40,10 @@ public class ErrorJob implements Serializable {
 	
 	@ManyToOne
 	private Job job;
+	
+	@Lob
+	private String requestApi;
+	
+	@Lob
+	private String responseApi;
 }

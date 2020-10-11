@@ -48,6 +48,14 @@ public class Job implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private StatusJob status;
 	
+	private int productInsert;
+	
+	private int productUpdate;
+	
+	private int fileSize;
+	
+	private int dbLocalSize;
+	
 	@OneToMany(cascade = CascadeType.ALL,targetEntity = ErrorJob.class, mappedBy = "job")
 	private Set<ErrorJob> errors;
 

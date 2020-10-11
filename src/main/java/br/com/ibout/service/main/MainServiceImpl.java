@@ -63,6 +63,10 @@ public class MainServiceImpl implements MainService {
 	private final BlackListService blackListService;
 
 	private static final Logger LOG = getLogger(MainServiceImpl.class);
+	
+	private int productInsert = 0;
+	
+	private int productUpdate = 0;
 
 	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService,
 			MessageService messageService, ProductService productService, ApiClientService apiClientService, BlackListService blackListService) {
@@ -77,6 +81,9 @@ public class MainServiceImpl implements MainService {
 
 	@Override
 	public void execute(String tokenClient, Long idClient) throws Exception {
+		this.productInsert = 0;
+		this.productUpdate = 0;
+		
 		Job job = Job.builder().startTime(now()).status(INICIADO).idClient(idClient).build();
 		Parameter parameter = this.parameterService.getByIdClient(idClient);
 		if (parameter == null) {
@@ -109,7 +116,7 @@ public class MainServiceImpl implements MainService {
 							}
 							
 							createProduct(parameter, mapping, tokenClient, idClient, job);
-							job = job.toBuilder().status(SUCESSO).endTime(now()).build();
+							job = job.toBuilder().status(SUCESSO).productInsert(productInsert).productUpdate(productUpdate).endTime(now()).build();
 							job = this.jobService.createOrUpdate(job);
 							LOG.info("Processo finalizado com sucesso. Aguardando proxima execucao: " + parameter.getHourJob());
 							
@@ -139,14 +146,17 @@ public class MainServiceImpl implements MainService {
 	private void createProduct(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job) throws Exception {
 		LOG.info("Comparando e criando produtos");
 		List<RequestInsertProductDto> listRequestInsertProductDto = new ArrayList<RequestInsertProductDto>();
-		List<Long> insert = new ArrayList<Long>();
-		List<Long> update = new ArrayList<Long>();
 		List<Product> listInsertProductDbLocal = new ArrayList<Product>();
 		List<BlackList> blackList = this.blackListService.getAllByIdClient(idClient);
 		List<Product> productsSaved = this.productService.getAll();
 		List<Product> productsToSave = dataSourceFactory(parameter.getDataSource()).read(parameter, mapping);
 		LOG.info("total de produtos no banco de dados local " + productsSaved.size());
 		LOG.info("total de produtos no arquivo " + productsToSave.size());
+		
+		
+		job.setDbLocalSize(productsSaved.size());
+		job.setFileSize(productsToSave.size());
+		this.jobService.createOrUpdate(job);
 		
 		productsToSave.stream().forEach(productToSave ->{
 			
@@ -155,12 +165,12 @@ public class MainServiceImpl implements MainService {
 				if(productSaved == null) {
 					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
 					listInsertProductDbLocal.add(productToSave);
-					insert.add(1L);
+					this.productInsert++;
 				}else if(!productSaved.equals(productToSave)){
 					productToSave.setId(productSaved.getId());
 					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
 					listInsertProductDbLocal.add(productToSave);
-					update.add(1L);
+					this.productUpdate++;
 				}	
 			}
 			
@@ -177,8 +187,8 @@ public class MainServiceImpl implements MainService {
 			listInsertProductDbLocal.clear();
 		}
 		
-		LOG.info("Total de produtos novos " + insert.size());			
-		LOG.info("Total de produtos atualizados " + update.size());
+		LOG.info("Total de produtos novos " + productInsert);			
+		LOG.info("Total de produtos atualizados " + productUpdate);
 	}
 	
 	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto, List<Product> listInsertProductDbLocal) {
@@ -191,7 +201,7 @@ public class MainServiceImpl implements MainService {
 			
 			if(isBlank(returnApi) || length(returnApi) > 500) {
 				String msg = messageService.getByCode("msg.error.call.api.insert.product");
-				ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
+				ErrorJob error = ErrorJob.builder().job(job).requestApi(new Gson().toJson(listRequestInsertProductDto)).responseApi(returnApi).description(msg).build();
 				job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 				LOG.error(msg);
 			}else {
@@ -200,12 +210,12 @@ public class MainServiceImpl implements MainService {
 			}
 		} catch (ClientProtocolException e) {
 			String msg = messageService.getByCode("msg.error.call.api.insert.product");
-			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(msg).build();
+			ErrorJob error = ErrorJob.builder().job(job).requestApi(new Gson().toJson(listRequestInsertProductDto)).responseApi(returnApi).stackTrace(e.getMessage()).description(msg).build();
 			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 			LOG.error(msg);
 		} catch (IOException e) {
 			String msg = messageService.getByCode("msg.error.call.api.insert.product");
-			ErrorJob error = ErrorJob.builder().job(job).stackTrace(e.getMessage()).description(msg).build();
+			ErrorJob error = ErrorJob.builder().job(job).requestApi(new Gson().toJson(listRequestInsertProductDto)).responseApi(returnApi).stackTrace(e.getMessage()).description(msg).build();
 			job = job.toBuilder().status(ERRO).errors(newHashSet(error)).build();
 			LOG.error(msg);
 		}
