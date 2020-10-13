@@ -52,6 +52,8 @@ public class Job implements Serializable {
 	
 	private int productUpdate;
 	
+	private int productDelete;
+	
 	private int fileSize;
 	
 	private int dbLocalSize;

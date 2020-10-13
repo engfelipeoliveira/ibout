@@ -80,5 +80,17 @@ public class Parameter implements Serializable {
 	
 	private String bdSqlConnDbLink;
 	
+	// rpinfo
+	private String rpiRpUrl;
+	
+	private String rpiRpUser;
+	
+	private String rpiRpPass;
+	
+	private String rpiWrpdvUrl;
+	
+	private String rpiWrpdvUser;
+	
+	private String rpiWrpdvToken;
 
 }

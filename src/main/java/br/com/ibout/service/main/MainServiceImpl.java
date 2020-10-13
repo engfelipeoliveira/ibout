@@ -65,8 +65,9 @@ public class MainServiceImpl implements MainService {
 	private static final Logger LOG = getLogger(MainServiceImpl.class);
 	
 	private int productInsert = 0;
-	
 	private int productUpdate = 0;
+	private int productDelete = 0;
+	
 
 	MainServiceImpl(ParameterService parameterService, JobService jobService, MappingService mappingService,
 			MessageService messageService, ProductService productService, ApiClientService apiClientService, BlackListService blackListService) {
@@ -83,6 +84,7 @@ public class MainServiceImpl implements MainService {
 	public void execute(String tokenClient, Long idClient) throws Exception {
 		this.productInsert = 0;
 		this.productUpdate = 0;
+		this.productDelete = 0;
 		
 		Job job = Job.builder().startTime(now()).status(INICIADO).idClient(idClient).build();
 		Parameter parameter = this.parameterService.getByIdClient(idClient);
@@ -116,7 +118,7 @@ public class MainServiceImpl implements MainService {
 							}
 							
 							createProduct(parameter, mapping, tokenClient, idClient, job);
-							job = job.toBuilder().status(SUCESSO).productInsert(productInsert).productUpdate(productUpdate).endTime(now()).build();
+							job = job.toBuilder().status(SUCESSO).productInsert(productInsert).productUpdate(productUpdate).productDelete(productDelete).endTime(now()).build();
 							job = this.jobService.createOrUpdate(job);
 							LOG.info("Processo finalizado com sucesso. Aguardando proxima execucao: " + parameter.getHourJob());
 							
@@ -163,35 +165,60 @@ public class MainServiceImpl implements MainService {
 			if(!blackList.stream().filter(bl -> bl.getCode().equalsIgnoreCase(productToSave.getCode())).findFirst().isPresent()) {
 				Product productSaved = productsSaved.stream().filter(p -> p.getCode().equalsIgnoreCase(productToSave.getCode())).findFirst().orElse(null);
 				if(productSaved == null) {
-					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
+					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter, 1L));
 					listInsertProductDbLocal.add(productToSave);
 					this.productInsert++;
 				}else if(!productSaved.equals(productToSave)){
 					productToSave.setId(productSaved.getId());
-					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter));
+					listRequestInsertProductDto.add(fromProductDto(productToSave, parameter, 1L));
 					listInsertProductDbLocal.add(productToSave);
 					this.productUpdate++;
 				}	
 			}
 			
 			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
-				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal);
+				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);
 				listRequestInsertProductDto.clear();
 				listInsertProductDbLocal.clear();
 			}
 		});
 		
 		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
-			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal);	
+			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);	
 			listRequestInsertProductDto.clear();
 			listInsertProductDbLocal.clear();
 		}
 		
+		
+		productsSaved.stream().forEach(productSaved -> {
+			Product productToSave = productsToSave.stream().filter(p -> p.getCode().equalsIgnoreCase(productSaved.getCode())).findFirst().orElse(null);
+			if(productToSave == null) {
+				listRequestInsertProductDto.add(fromProductDto(productSaved, parameter, 0L));
+				listInsertProductDbLocal.add(productSaved);
+				this.productDelete++;
+			}
+			
+			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
+				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);
+				listRequestInsertProductDto.clear();
+				listInsertProductDbLocal.clear();
+			}
+		});
+		
+		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
+			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);	
+			listRequestInsertProductDto.clear();
+			listInsertProductDbLocal.clear();
+		}
+		
+		
 		LOG.info("Total de produtos novos " + productInsert);			
 		LOG.info("Total de produtos atualizados " + productUpdate);
+		LOG.info("Total de produtos excluidos " + productDelete);
 	}
 	
-	private String callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, List<RequestInsertProductDto> listRequestInsertProductDto, List<Product> listInsertProductDbLocal) {
+	private void callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, 
+			List<RequestInsertProductDto> listRequestInsertProductDto, List<Product> listInsertProductDbLocal, boolean isDelete) {
 		LOG.info("Executando API");
 		String returnApi = null;
 		try {
@@ -206,7 +233,11 @@ public class MainServiceImpl implements MainService {
 				LOG.error(msg);
 			}else {
 				LOG.info("Atualizando produtos no BD local");
-				productService.createOrUpdateAll(listInsertProductDbLocal);
+				if(isDelete) {
+					productService.deleteAll(listInsertProductDbLocal);
+				}else {
+					productService.createOrUpdateAll(listInsertProductDbLocal);					
+				}
 			}
 		} catch (ClientProtocolException e) {
 			String msg = messageService.getByCode("msg.error.call.api.insert.product");
@@ -222,7 +253,6 @@ public class MainServiceImpl implements MainService {
 		
 		this.jobService.createOrUpdate(job);
 		
-		return returnApi;
 	}
 	
 	private DataSourceService dataSourceFactory(DataSource dataSource) throws Exception {

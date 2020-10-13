@@ -10,5 +10,6 @@ public interface ProductService {
 	List<Product> getAll();
 	void deleteAll();
 	void createOrUpdateAll(List<Product> products);
+	void deleteAll(List<Product> products);
 }
 

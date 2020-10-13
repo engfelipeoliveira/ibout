@@ -53,7 +53,7 @@ public class MapperRequestInsertProductDto {
 		return term;
 	}
 	
-	public static RequestInsertProductDto fromProductDto(Product product, Parameter parameter) {
+	public static RequestInsertProductDto fromProductDto(Product product, Parameter parameter, Long visible) {
 		return RequestInsertProductDto.builder()
 				.codigo(normalizeText(product.getCode()))
 				.descricao(normalizeText(product.getDescription()))
@@ -70,7 +70,7 @@ public class MapperRequestInsertProductDto {
 				.id_estabelecimento(product.getIdClient())
 				.foto(isBlank(product.getPhoto()) ? format("%s%s%s", "img/", product.getCode(), ".png") : product.getPhoto())
 				.unidade(getUnitFromParameter(product, parameter))
-				.visivel(1L)
+				.visivel(visible)
 				.build();
 	}
 
