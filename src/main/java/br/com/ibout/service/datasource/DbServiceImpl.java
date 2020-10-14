@@ -70,6 +70,5 @@ public class DbServiceImpl implements DataSourceService {
 				.unit(mapping.getUnit() != null && rs.getString(mapping.getUnit() + 1) != null ? trimToNull(rs.getString(mapping.getUnit() + 1)) : null)
 				.build();
 	}
-	
 
 }

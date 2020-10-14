@@ -3,6 +3,7 @@ package br.com.ibout.service.main;
 import static br.com.ibout.dto.MapperRequestInsertProductDto.fromProductDto;
 import static br.com.ibout.enums.DataSource.CSV;
 import static br.com.ibout.enums.DataSource.DB;
+import static br.com.ibout.enums.DataSource.RPINFO;
 import static br.com.ibout.enums.DataSource.TXT;
 import static br.com.ibout.enums.DataSource.XLS;
 import static br.com.ibout.enums.StatusJob.ERRO;
@@ -43,6 +44,7 @@ import br.com.ibout.service.blacklist.BlackListService;
 import br.com.ibout.service.datasource.CsvServiceImpl;
 import br.com.ibout.service.datasource.DataSourceService;
 import br.com.ibout.service.datasource.DbServiceImpl;
+import br.com.ibout.service.datasource.RpInfoServiceImpl;
 import br.com.ibout.service.datasource.TxtServiceImpl;
 import br.com.ibout.service.datasource.XlsServiceImpl;
 import br.com.ibout.service.job.JobService;
@@ -102,7 +104,7 @@ public class MainServiceImpl implements MainService {
 				if(parameter.isActive() && asList(split(parameter.getHourJob(), ",")).contains(now().format(ofPattern("HH:mm")))){
 					job = this.jobService.createOrUpdate(job);
 					Mapping mapping = mappingService.getByIdClient(idClient);
-					if (mapping == null) {
+					if (mapping == null && !RPINFO.equals(parameter.getDataSource())) {
 						String msg = messageService.getByCode("msg.error.validation.mapping.not.found");
 						ErrorJob error = ErrorJob.builder().job(job).description(msg).build();
 						job = job.toBuilder().endTime(now()).status(ERRO).errors(newHashSet(error)).build();
@@ -110,7 +112,6 @@ public class MainServiceImpl implements MainService {
 						LOG.error("Processo finalizado com erro");
 					} else {
 						LOG.info(parameter.toString());
-						LOG.info(mapping.toString());
 						try {
 							if(parameter.isImportAll()) {
 								LOG.info("Deletando produtos do banco de dados local");
@@ -177,14 +178,14 @@ public class MainServiceImpl implements MainService {
 			}
 			
 			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
-				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);
+				callApiClientService(parameter, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);
 				listRequestInsertProductDto.clear();
 				listInsertProductDbLocal.clear();
 			}
 		});
 		
 		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
-			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);	
+			callApiClientService(parameter, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, false);	
 			listRequestInsertProductDto.clear();
 			listInsertProductDbLocal.clear();
 		}
@@ -199,14 +200,14 @@ public class MainServiceImpl implements MainService {
 			}
 			
 			if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty() && listRequestInsertProductDto.size() == parseInt(parameter.getApiSizeArrayInsertProduct())) {
-				callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);
+				callApiClientService(parameter, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);
 				listRequestInsertProductDto.clear();
 				listInsertProductDbLocal.clear();
 			}
 		});
 		
 		if(listRequestInsertProductDto != null && !listRequestInsertProductDto.isEmpty()) {
-			callApiClientService(parameter, mapping, tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);	
+			callApiClientService(parameter,  tokenClient, idClient, job, listRequestInsertProductDto, listInsertProductDbLocal, true);	
 			listRequestInsertProductDto.clear();
 			listInsertProductDbLocal.clear();
 		}
@@ -217,7 +218,7 @@ public class MainServiceImpl implements MainService {
 		LOG.info("Total de produtos excluidos " + productDelete);
 	}
 	
-	private void callApiClientService(Parameter parameter, Mapping mapping, String tokenClient, Long idClient, Job job, 
+	private void callApiClientService(Parameter parameter, String tokenClient, Long idClient, Job job, 
 			List<RequestInsertProductDto> listRequestInsertProductDto, List<Product> listInsertProductDbLocal, boolean isDelete) {
 		LOG.info("Executando API");
 		String returnApi = null;
@@ -264,7 +265,9 @@ public class MainServiceImpl implements MainService {
 			return new XlsServiceImpl();
 		} else if (DB.equals(dataSource)) {
 			return new DbServiceImpl();
-		}else {
+		} else if (RPINFO.equals(dataSource)) {
+			return new RpInfoServiceImpl();
+		} else {
 			LOG.error("Tipo de arquivo nao implementado");
 			throw new Exception("Tipo de arquivo nao implementado");
 		}

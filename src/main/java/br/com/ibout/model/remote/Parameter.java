@@ -92,5 +92,7 @@ public class Parameter implements Serializable {
 	private String rpiWrpdvUser;
 	
 	private String rpiWrpdvToken;
+	
+	private String cnpjClient;
 
 }

@@ -2,6 +2,7 @@ package br.com.ibout.service.parameter;
 
 import static br.com.ibout.enums.DataSource.CSV;
 import static br.com.ibout.enums.DataSource.DB;
+import static br.com.ibout.enums.DataSource.RPINFO;
 import static br.com.ibout.enums.DataSource.TXT;
 import static br.com.ibout.enums.DataSource.XLS;
 import static java.lang.Long.parseLong;
@@ -75,7 +76,7 @@ public class ParameterServiceImpl implements ParameterService {
 			}
 
 			if (parameter.getDataSource() != null && !TXT.equals(parameter.getDataSource()) && !CSV.equals(parameter.getDataSource())
-					&& !DB.equals(parameter.getDataSource()) && !XLS.equals(parameter.getDataSource())) {
+					&& !DB.equals(parameter.getDataSource()) && !XLS.equals(parameter.getDataSource()) && !RPINFO.equals(parameter.getDataSource())) {
 				String msg = this.messageService.getByCode("msg.error.validation.datasource.invalid");
 				LOG.error(msg);
 				listErrors.add(msg);
@@ -173,6 +174,13 @@ public class ParameterServiceImpl implements ParameterService {
 					listErrors.add(msg);
 				}
 				
+			}
+			
+			if (parameter.getDataSource() != null && RPINFO.equals(parameter.getDataSource())
+					&& isAnyBlank(new String[] { parameter.getRpiRpPass(), parameter.getRpiRpUrl(), parameter.getRpiRpUser(), parameter.getRpiWrpdvToken(), parameter.getRpiWrpdvUrl(), parameter.getRpiWrpdvUser() })) {
+				String msg = this.messageService.getByCode("msg.error.validation.rpinfo.invalid");
+				LOG.error(msg);
+				listErrors.add(msg);
 			}
 		}
 

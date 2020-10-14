@@ -1,6 +1,7 @@
 package br.com.ibout.service.apiclient;
 
 import static java.lang.String.format;
+import static org.apache.http.impl.client.HttpClients.createDefault;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,7 +11,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class ApiClientServiceImpl implements ApiClientService {
 	
 	@Override
 	public String callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
+		CloseableHttpClient httpClient = createDefault();
 		String result = null;
 		try {
 			HttpPost httpPost = new HttpPost(format("%s%s/%s", parameter.getApiUrlInsertProduct(), idClient, tokenClient));
