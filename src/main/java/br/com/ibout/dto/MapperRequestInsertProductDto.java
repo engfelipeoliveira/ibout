@@ -40,8 +40,8 @@ public class MapperRequestInsertProductDto {
 	}
 	
 	private static String normalizeText(String term) {
-		String[] searchList = {"?","*","'"};
-		String[] replacementList = {"","",""};
+		String[] searchList = {"?","*","'","%"};
+		String[] replacementList = {"","","",""};
 		
 		term = trimToEmpty(term);
 		term = stripAccents(term);
