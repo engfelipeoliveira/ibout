@@ -26,6 +26,7 @@ public class ApiClientServiceImpl implements ApiClientService {
 	public String callInsertProduct(String tokenClient, Long idClient, List<RequestInsertProductDto> requestInsertProductDto, Parameter parameter) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpClient = createDefault();
 		String result = null;
+		CloseableHttpResponse response = null;
 		try {
 			HttpPost httpPost = new HttpPost(format("%s%s/%s", parameter.getApiUrlInsertProduct(), idClient, tokenClient));
 			Gson gson = new Gson();
@@ -34,12 +35,13 @@ public class ApiClientServiceImpl implements ApiClientService {
 			StringEntity entity = new StringEntity(json);
 			httpPost.setEntity(entity);
 			httpPost.setHeader("Content-type", "application/json");
-			CloseableHttpResponse response = httpClient.execute(httpPost);
-
+			response = httpClient.execute(httpPost);
+			
 			if (response.getStatusLine().getStatusCode() == 200) {
 				result = EntityUtils.toString(response.getEntity());
 			}
 		} finally {
+			response.close();
 			httpClient.close();
 		}
 		
